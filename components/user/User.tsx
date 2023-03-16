@@ -1,14 +1,14 @@
 import React from 'react';
-import { PostProps } from './Post';
+import { PostProps } from '../Post';
 import Link from 'next/link';
 
 export type UserProps = {
   id: String;
   name: String;
   email: String;
-  createdAt: String;
-  updatedAt: String;
-  posts: PostProps[]
+  createdAt?: String;
+  updatedAt?: String;
+  posts?: PostProps[]
 }
 
 const User: React.FC<{user: UserProps }> = ({user}) => {

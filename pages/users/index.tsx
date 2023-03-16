@@ -1,10 +1,12 @@
 import { GetStaticProps } from 'next';
 import Layout from '../../components/Layout';
-import User, { UserProps } from '../../components/User';
+import User, { UserProps } from '../../components/user/User';
 import prisma from '../../lib/prisma';
 import React from 'react';
 import Link from 'next/link';
+import UserFrom from '../../components/user/UserForm'
 
+//ユーザ一覧の型定義
 type Props = {
   users: UserProps[]
 }
@@ -26,12 +28,12 @@ const Users: React.FC<Props> = (props) => {
       </Link>
       <h1>User一覧</h1>
       <main>
+        <UserFrom />
         {props.users.map((user) => (
           <div key={`${user.id}`}>
             <User user={user}/>
           </div>
         ))}
-
       </main>
     </Layout>
     
