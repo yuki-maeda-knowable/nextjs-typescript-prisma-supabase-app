@@ -36,6 +36,8 @@ export default function UserForm() {
     //フォーム初期化
     resetField("name")
     resetField("email")
+    console.log(data);
+    
     // ユーザ一覧にリダイレクト
     router.push('/users')
   }

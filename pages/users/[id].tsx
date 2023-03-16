@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import prisma from '../../lib/prisma';
-import { UserProps } from '../../components/User';
+import { UserProps } from '../../components/user/User';
 import Layout from '../../components/Layout';
 
 export const getServerSideProps: GetServerSideProps = async ({params}) => {
