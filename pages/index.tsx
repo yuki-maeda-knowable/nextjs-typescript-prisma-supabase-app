@@ -1,9 +1,9 @@
-import React from "react"
-import { GetStaticProps } from "next"
-import Layout from "../components/Layout"
-import Post, { PostProps } from "../components/Post"
-import prisma from "../lib/prisma"
-import Link from "next/link"
+import React from "react";
+import { GetStaticProps } from "next";
+import Layout from "../components/Layout";
+import Post, { PostProps } from "../components/Post";
+import prisma from "../lib/prisma";
+import Link from "next/link";
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
@@ -21,18 +21,34 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 type Props = {
-  feed: PostProps[]
-}
+  feed: PostProps[];
+};
 
 const Blog: React.FC<Props> = (props) => {
   return (
     <Layout>
       <div className="page">
-        <Link href={`/users`}>
-          ユーザ一覧
-        </Link>
         <h1>Public Feed</h1>
+
         <main>
+          <div className="md:w-2/3">
+            <button
+              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
+              type="button"
+            >
+              <Link href={`/users`}>ユーザ一覧</Link>
+            </button>
+          </div>
+
+          <div className="md:w-2/3">
+            <button
+              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
+              type="button"
+            >
+              <Link href={`/users/create`}>sign in</Link>
+            </button>
+          </div>
+
           {props.feed.map((post) => (
             <div key={post.id} className="post">
               <Post post={post} />
@@ -55,7 +71,7 @@ const Blog: React.FC<Props> = (props) => {
         }
       `}</style>
     </Layout>
-  )
-}
+  );
+};
 
-export default Blog
+export default Blog;
