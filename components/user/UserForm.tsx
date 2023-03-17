@@ -2,11 +2,11 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-export type Inputs = {
+interface UserInput {
   name: String;
   email: String;
   password: String;
-};
+}
 
 export default function UserForm() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function UserForm() {
     watch,
     resetField,
     formState: { errors },
-  } = useForm<Inputs>({
+  } = useForm<UserInput>({
     defaultValues: {
       name: "",
       email: "",
@@ -24,7 +24,7 @@ export default function UserForm() {
     },
   });
 
-  const SubmitUserRegister = async (input: Inputs) => {
+  const submitUserRegister = async (input: UserInput) => {
     const formData = {
       name: input.name,
       email: input.email,
@@ -59,7 +59,7 @@ export default function UserForm() {
       <h3>ユーザー登録</h3>
 
       <form
-        onSubmit={handleSubmit(SubmitUserRegister)}
+        onSubmit={handleSubmit(submitUserRegister)}
         className="w-full max-w-sm"
       >
         <div className="md:flex md:items-center mb-6">
