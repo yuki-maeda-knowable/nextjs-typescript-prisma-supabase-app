@@ -18,12 +18,18 @@ export default function PostForm() {
     defaultValues: {
       title: "",
       content: "",
-      published: false,
+      published: true,
     },
   });
 
   const submitPostRegister = async (input: PostInput) => {
+    // //TODO
+    // publishedの真偽値の受け取りがうまくできないから後ほど
     const published = JSON.parse(JSON.stringify(input.published));
+    console.log("1: " + input.published);
+    console.log("2: " + published);
+    console.log("3: " + Boolean(published));
+
     const { title, content } = input;
     const postData = {
       title: title,
@@ -106,7 +112,7 @@ export default function PostForm() {
               defaultChecked
               id="default-radio-2"
               type="radio"
-              value={true}
+              value="false"
               name="default-radio"
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
             />
