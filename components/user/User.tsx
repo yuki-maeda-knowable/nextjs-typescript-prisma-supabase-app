@@ -1,18 +1,18 @@
-import React from 'react';
-import { PostProps } from '../Post';
-import Link from 'next/link';
+import React from "react";
+import { PostProps } from "../Post";
+import Link from "next/link";
 
 export type UserProps = {
   id: String;
   name: String;
   email: String;
+  password: String;
   createdAt?: String;
   updatedAt?: String;
-  posts?: PostProps[]
-}
+  posts?: PostProps[];
+};
 
-const User: React.FC<{user: UserProps }> = ({user}) => {
-
+const User: React.FC<{ user: UserProps }> = ({ user }) => {
   return (
     <div>
       <h2>{user.name}</h2>
@@ -21,7 +21,7 @@ const User: React.FC<{user: UserProps }> = ({user}) => {
       </Link>
       <hr />
     </div>
-  )
-}
+  );
+};
 
-export default User
+export default User;
