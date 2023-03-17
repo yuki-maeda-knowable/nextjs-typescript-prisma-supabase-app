@@ -45,7 +45,7 @@ export default function PostForm() {
         },
         body: JSON.stringify(postData),
       });
-      const data = res.json();
+      const data = await res.json();
       console.log(data);
       resetField("title");
       resetField("content");
@@ -84,7 +84,6 @@ export default function PostForm() {
             <textarea
               {...register("content", { required: "たくさん書いてね" })}
               id="message"
-              rows="4"
               className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
               placeholder="content"
             ></textarea>
