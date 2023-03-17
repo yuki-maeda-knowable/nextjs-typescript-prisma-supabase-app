@@ -20,7 +20,8 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const Users = (props: Props) => {
-  const [users, setUsers] = useState<Props[]>([]);
+  const [users, setUsers] = useState<UserProps[]>(props.users);
+
   useEffect(() => {
     const fetchData = async () => {
       try {

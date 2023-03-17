@@ -24,9 +24,9 @@ type Props = {
   feed: PostProps[];
 };
 
-const Blog: React.FC<Props> = (props) => {
+const Blog = (props: Props) => {
   //postが作成されたら、状態を更新する必要があるため、feedを定義
-  const [feed, setFeed] = useState<PostProps[]>([]);
+  const [feed, setFeed] = useState<PostProps[]>(props.feed);
 
   useEffect(() => {
     const fetchData = async () => {
