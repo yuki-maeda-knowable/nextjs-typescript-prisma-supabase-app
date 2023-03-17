@@ -38,14 +38,20 @@ const Blog: React.FC<Props> = (props) => {
             >
               <Link href={`/users`}>ユーザ一覧</Link>
             </button>
-          </div>
 
-          <div className="md:w-2/3">
             <button
               className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
               type="button"
             >
               <Link href={`/users/create`}>sign in</Link>
+            </button>
+          </div>
+          <div className="md:w-2/3">
+            <button
+              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
+              type="button"
+            >
+              <Link href={`/p/create`}>New Post</Link>
             </button>
           </div>
 
