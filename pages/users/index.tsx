@@ -28,6 +28,9 @@ const Users = (props: Props) => {
           <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
             <Link href={`/`}>Home</Link>
           </button>
+          <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
+            <Link href={`/users/create`}>add User</Link>
+          </button>
         </div>
         <h1>User一覧</h1>
         <hr />
