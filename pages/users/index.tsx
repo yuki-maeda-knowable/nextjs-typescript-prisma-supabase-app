@@ -2,9 +2,8 @@ import { GetStaticProps } from "next";
 import Layout from "../../components/Layout";
 import User, { UserProps } from "../../components/user/User";
 import prisma from "../../lib/prisma";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import UserFrom from "../../components/user/UserForm";
 
 //ユーザ一覧の型定義
 type Props = {
@@ -21,6 +20,21 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 const Users = (props: Props) => {
+  const [users, setUsers] = useState<Props[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/user`);
+        const newUser = await res.json();
+        setUsers(newUser);
+        console.log(newUser);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Layout>
       <main>

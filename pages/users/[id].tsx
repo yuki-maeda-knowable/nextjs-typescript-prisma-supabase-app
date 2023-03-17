@@ -61,7 +61,7 @@ const User = (user: UserProps) => {
     const data = await res.json();
     console.log(data);
 
-    router.push(`/users/${id}`);
+    router.push(`/users`);
   };
 
   return (

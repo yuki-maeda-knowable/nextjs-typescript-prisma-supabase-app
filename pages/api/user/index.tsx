@@ -17,5 +17,8 @@ export default async function handler(
       },
     });
     return res.status(200).json({ message: "ユーザ登録OK" });
+  } else if (req.method === "GET") {
+    await prisma.user.findMany({});
+    return res.status(200).json({ message: "ユーザ再取得" });
   }
 }

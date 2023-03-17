@@ -15,6 +15,18 @@ export default async function handler(
         published: published,
       },
     });
+    return res.status(200).json({ message: "post登録できたよ" });
+  } else if (req.method === "GET") {
+    await prisma.post.findMany({
+      where: {
+        published: true,
+      },
+      include: {
+        author: {
+          select: { name: true },
+        },
+      },
+    });
+    return res.status(200).json({ message: "post再取得" });
   }
-  return res.status(200).json({ message: "post登録できたよ" });
 }
