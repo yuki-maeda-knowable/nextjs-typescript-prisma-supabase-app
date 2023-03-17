@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { GetStaticProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
@@ -25,6 +25,22 @@ type Props = {
 };
 
 const Blog: React.FC<Props> = (props) => {
+  //postが作成されたら、状態を更新する必要があるため、feedを定義
+  const [feed, setFeed] = useState<PostProps[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/post`);
+        const newFeed = await res.json();
+        setFeed(newFeed);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Layout>
       <div className="page">
