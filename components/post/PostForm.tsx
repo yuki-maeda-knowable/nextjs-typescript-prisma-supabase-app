@@ -11,30 +11,22 @@ export default function PostForm() {
   const router = useRouter();
   const {
     register,
-    resetField,
     handleSubmit,
     formState: { errors },
   } = useForm<PostInput>({
     defaultValues: {
       title: "",
       content: "",
-      published: true,
+      published: false,
     },
   });
 
   const submitPostRegister = async (input: PostInput) => {
-    // //TODO
-    // publishedの真偽値の受け取りがうまくできないから後ほど
-    const published = JSON.parse(JSON.stringify(input.published));
-    console.log("1: " + input.published);
-    console.log("2: " + published);
-    console.log("3: " + Boolean(published));
-
-    const { title, content } = input;
+    const { title, content, published } = input;
     const postData = {
       title: title,
       content: content,
-      published: Boolean(published),
+      published: published,
     };
 
     try {
@@ -46,10 +38,7 @@ export default function PostForm() {
         body: JSON.stringify(postData),
       });
       const data = await res.json();
-      console.log(data);
-      resetField("title");
-      resetField("content");
-      router.push("/");
+      router.push("/p/drafts");
     } catch (error) {
       console.error("Error registration Post: ", error);
     }
@@ -90,34 +79,6 @@ export default function PostForm() {
             {errors.content && (
               <span style={{ color: "red" }}>{errors.content?.message}</span>
             )}
-          </div>
-
-          <div className="flex items-center mb-4">
-            <input
-              {...register("published")}
-              id="default-radio-1"
-              type="radio"
-              value="true"
-              name="default-radio"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 "
-            />
-            <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              published
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              {...register("published")}
-              defaultChecked
-              id="default-radio-2"
-              type="radio"
-              value="false"
-              name="default-radio"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500"
-            />
-            <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              No published
-            </label>
           </div>
           <div className="flex items-center justify-between">
             <button

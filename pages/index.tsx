@@ -4,6 +4,7 @@ import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
@@ -24,9 +25,10 @@ type Props = {
   feed: PostProps[];
 };
 
-const Blog: React.FC<Props> = (props) => {
+const Blog = (props: Props) => {
   //postが作成されたら、状態を更新する必要があるため、feedを定義
-  const [feed, setFeed] = useState<PostProps[]>([]);
+  const [feed, setFeed] = useState<PostProps[]>(props.feed);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +41,7 @@ const Blog: React.FC<Props> = (props) => {
       }
     };
     fetchData();
-  }, []);
+  }, [props]);
 
   return (
     <Layout>
@@ -54,13 +56,6 @@ const Blog: React.FC<Props> = (props) => {
             >
               <Link href={`/users`}>ユーザ一覧</Link>
             </button>
-
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
-              type="button"
-            >
-              <Link href={`/users/create`}>sign in</Link>
-            </button>
           </div>
           <div className="md:w-2/3">
             <button
@@ -70,10 +65,9 @@ const Blog: React.FC<Props> = (props) => {
               <Link href={`/p/create`}>New Post</Link>
             </button>
           </div>
-
           {props.feed.map((post) => (
             <div key={post.id} className="post">
-              <Post post={post} />
+              {session && <Post post={post} />}
             </div>
           ))}
         </main>
