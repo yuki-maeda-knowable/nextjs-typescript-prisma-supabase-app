@@ -34,7 +34,7 @@ const Users = (props: Props) => {
       }
     };
     fetchData();
-  }, []);
+  }, [props.users]);
 
   return (
     <Layout>
