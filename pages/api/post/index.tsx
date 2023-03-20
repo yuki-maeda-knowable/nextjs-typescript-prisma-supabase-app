@@ -1,3 +1,4 @@
+import { getSession } from "next-auth/react";
 import prisma from "../../../lib/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -7,17 +8,25 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const { title, content, published } = req.body;
-
-    await prisma.post.create({
+    // ログインしているユーザのsession情報を取得
+    const session = await getSession({ req });
+    const { email } = session.user;
+    const data = await prisma.post.create({
       data: {
         title: title,
         content: content,
         published: published,
+        // 登録しているユーザでemailがログインしているユーザであるか
+        author: {
+          connect: {
+            email: email,
+          },
+        },
       },
     });
-    return res.status(200).json({ message: "post登録できたよ" });
+    return res.status(200).json(data);
   } else if (req.method === "GET") {
-    await prisma.post.findMany({
+    const data = await prisma.post.findMany({
       where: {
         published: true,
       },
@@ -27,6 +36,6 @@ export default async function handler(
         },
       },
     });
-    return res.status(200).json({ message: "post再取得" });
+    return res.status(200).json(data);
   }
 }
