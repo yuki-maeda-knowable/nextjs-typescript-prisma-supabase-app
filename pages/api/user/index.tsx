@@ -9,14 +9,14 @@ export default async function handler(
   if (req.method === "POST") {
     const { name, email, password } = req.body;
     const hash_password = await hash(password, 10);
-    await prisma.user.create({
+    const data = await prisma.user.create({
       data: {
         name: name,
         email: email,
         password: hash_password,
       },
     });
-    return res.status(200).json({ message: "ユーザ登録OK" });
+    return res.status(200).json(data);
   } else if (req.method === "GET") {
     await prisma.user.findMany({});
     return res.status(200).json({ message: "ユーザ再取得" });

@@ -53,7 +53,6 @@ const Drafts = (props: Drafts) => {
       <div className="page">
         <h1>My Drafts</h1>
         <main>
-          {!session}
           {props.drafts.map((post) => (
             <div key={post.id} className="post">
               <Post post={post} />

@@ -11,6 +11,7 @@ export default async function handler(
     // ログインしているユーザのsession情報を取得
     const session = await getSession({ req });
     const { email } = session.user;
+
     const data = await prisma.post.create({
       data: {
         title: title,
@@ -24,6 +25,7 @@ export default async function handler(
         },
       },
     });
+
     return res.status(200).json(data);
   } else if (req.method === "GET") {
     const data = await prisma.post.findMany({
