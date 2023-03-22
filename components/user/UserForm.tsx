@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 interface UserInput {
   name: String;
@@ -41,14 +42,17 @@ export default function UserForm() {
       });
       // json形式で返す
       const data = await res.json();
-      console.log(data);
-      //フォーム初期化
-      resetField("name");
-      resetField("email");
-      resetField("password");
+      const email = data.email;
+      //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
+      const password = formData.password;
+      //sign In()でそのままログイン
 
-      // ユーザ一覧にリダイレクト
-      router.push("/users");
+      await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: "/",
+        redirect: true,
+      });
     } catch (error) {
       console.error("Error registering user:", error);
     }
