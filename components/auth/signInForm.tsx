@@ -26,12 +26,10 @@ export default function SignInForm() {
       email: input.email,
       password: input.password,
     };
-    // signIn()ように書き換える
     try {
-      const res = await signIn("credentials", {
+      await signIn("credentials", {
         email: formData.email,
         password: formData.password,
-        //callbackUrl指定するとログインした後sessionが削除されるなああ。
         callbackUrl: "/p/drafts",
         redirect: true,
       });

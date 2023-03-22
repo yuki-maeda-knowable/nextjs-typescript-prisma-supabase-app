@@ -9,6 +9,7 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/auth/signin",
   },
+  secret: process.env.NEXT_PUBLIC_SECRET,
   // Configure one or more authentication providers
   providers: [
     GitHubProvider({
