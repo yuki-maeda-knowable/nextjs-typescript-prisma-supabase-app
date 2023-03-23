@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import PostSearchForm from "../components/post/postSearchForm";
 
-export const getStaticProps: GetStaticProps = async () => {
+type Props = {
+  feed: PostProps[];
+  keyword: string;
+  sample: string;
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { keyword } = context.query;
+
+  // 検索ワードが配列になっちゃうから、一旦文字列に変換
+  const keywordString: string = Array.isArray(keyword) ? keyword[0] : keyword;
   const feed = await prisma.post.findMany({
-    where: { published: true },
+    where: {
+      published: true,
+      title: {
+        contains: keywordString,
+      },
+    },
     include: {
       author: {
         select: { name: true },
@@ -17,12 +33,7 @@ export const getStaticProps: GetStaticProps = async () => {
   });
   return {
     props: { feed },
-    revalidate: 10,
   };
-};
-
-type Props = {
-  feed: PostProps[];
 };
 
 const Blog = (props: Props) => {
@@ -57,13 +68,8 @@ const Blog = (props: Props) => {
               <Link href={`/users`}>ユーザ一覧</Link>
             </button>
           </div>
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
-              type="button"
-            >
-              <Link href={`/p/create`}>New Post</Link>
-            </button>
+          <div className="text-right">
+            <PostSearchForm />
           </div>
           {props.feed.map((post) => (
             <div key={post.id} className="post">
