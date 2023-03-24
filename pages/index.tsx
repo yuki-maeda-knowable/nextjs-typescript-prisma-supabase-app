@@ -65,7 +65,7 @@ const Blog = (props: Props) => {
               className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
               type="button"
             >
-              <Link href={`/users`}>ユーザ一覧</Link>
+              <Link href={`/users/${session?.user?.id}`}>profile</Link>
             </button>
           </div>
           <div className="text-right">
