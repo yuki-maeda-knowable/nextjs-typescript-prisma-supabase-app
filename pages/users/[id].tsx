@@ -68,30 +68,51 @@ const User = (user: UserProps) => {
     // setValue("createObjUrl", URL.createObjectURL(files[0]));
   };
   const submitUserUpdate = async (input: UserInput) => {
-    const { name, email, password } = input;
-    // Create a reference to 'images/mountains.jpg'
-    const mountainImagesRef = ref(storage, "images/" + image.name);
-    // 'file' comes from the Blob or File API
-    await uploadBytes(mountainImagesRef, image);
-    const objUrl = await getDownloadURL(mountainImagesRef);
+    if (!image) {
+      const { name, email, password } = input;
+      // Create a reference to 'images/mountains.jpg'
+      // const mountainImagesRef = ref(storage, "images/" + image.name);
+      // // 'file' comes from the Blob or File API
+      // await uploadBytes(mountainImagesRef, image);
+      // const objUrl = await getDownloadURL(mountainImagesRef);
 
-    const formData = {
-      name: name,
-      email: email,
-      password: password,
-      image: objUrl,
-    };
-    const res = await fetch(`/api/user/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "Application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    console.log(data);
+      const formData = {
+        name: name,
+        email: email,
+        password: password,
+        // image: objUrl,
+      };
+      const res = await fetch(`/api/user/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      router.push(`/users/${id}`);
+    } else {
+      const { name, email, password } = input;
+      // Create a reference to 'images/mountains.jpg'
+      const mountainImagesRef = ref(storage, "images/" + image.name);
+      // 'file' comes from the Blob or File API
+      await uploadBytes(mountainImagesRef, image);
+      const objUrl = await getDownloadURL(mountainImagesRef);
 
-    router.push(`/users/${id}`);
+      const formData = {
+        name: name,
+        email: email,
+        password: password,
+        image: objUrl,
+      };
+      const res = await fetch(`/api/user/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      router.push(`/users/${id}`);
+    }
   };
 
   return (
