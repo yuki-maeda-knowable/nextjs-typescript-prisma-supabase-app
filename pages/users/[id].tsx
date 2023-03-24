@@ -19,7 +19,7 @@ interface UserInput {
 }
 
 type image = File; //画像の保存用
-type createObjUrl = string; //画像のpreview表示用
+type createObjUrl = any; //画像のpreview表示用
 // interface profileImage {
 //   createObjUrl: string;
 // }
@@ -71,13 +71,12 @@ const User = (user: UserProps) => {
   const submitUserUpdate = async (input: UserInput) => {
     // 画像が未選択
     if (!image) {
-      const { name, email, password } = input;
-      const objUrl = user.image;
+      const { name, email, password, image } = input;
       const formData = {
         name: name,
         email: email,
         password: password,
-        image: objUrl,
+        image: image,
       };
       const res = await fetch(`/api/user/${id}`, {
         method: "PUT",
