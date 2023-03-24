@@ -3,23 +3,16 @@ import prisma from "../../lib/prisma";
 import { UserProps } from "../../components/user/User";
 import Layout from "../../components/Layout";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/router";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { storage } from "../../helpers/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface UserInput {
   id: String;
   name: String;
   email: String;
   password: String;
-  image?: String;
 }
-interface profileImage {
-  createObjUrl: string; //画像のpreview表示用
-}
+
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const data = await prisma.user.findUnique({
     where: {
@@ -38,79 +31,37 @@ const User = (user: UserProps) => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<UserProps>({
     defaultValues: {
       name: user.name,
       email: user.email,
-      password: "",
-      image: user.image,
+      password: user.password,
     },
   });
   const router = useRouter();
   const { id } = router.query;
-  const inputRef = useRef<HTMLInputElement>();
 
-  const [image, setImage] = useState<any>();
-  const [createObjUrl, setCreateObjUrl] = useState<string>();
-
-  if (!createObjUrl) {
-    setCreateObjUrl("/images/sample.png");
-  }
-  // アップロード画像のプレビュー表示
-  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //画像の情報をfilesに格納
-    const { files } = e.target;
-    setCreateObjUrl(URL.createObjectURL(files[0]));
-    setImage(files[0]);
-    // setValueで'imageUrl'のvalueにセットしてあげる
-    // setValue("createObjUrl", URL.createObjectURL(files[0]));
-  };
   const submitUserUpdate = async (input: UserInput) => {
-    // 画像が未選択
-    if (!image) {
-      const { name, email, password } = input;
-      const objUrl = user.image;
-      const formData = {
-        name: name,
-        email: email,
-        password: password,
-        image: objUrl,
-      };
-      const res = await fetch(`/api/user/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "Application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      router.push(`/users/${id}`);
-    }
-    // 画像が選択されてたら
-    else {
-      const { name, email, password } = input;
-      // Create a reference to 'images/mountains.jpg'
-      const mountainImagesRef = ref(storage, "images/" + image.name);
-      // 'file' comes from the Blob or File API
-      await uploadBytes(mountainImagesRef, image);
-      const objUrl = await getDownloadURL(mountainImagesRef);
+    const { name, email, password } = input;
 
-      const formData = {
-        name: name,
-        email: email,
-        password: password,
-        image: objUrl,
-      };
-      const res = await fetch(`/api/user/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "Application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      router.push(`/users/${id}`);
-    }
+    const formData = {
+      name: name,
+      email: email,
+      password: password,
+    };
+
+    const res = await fetch(`/api/user/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "Application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const data = await res.json();
+    console.log(data);
+
+    router.push(`/users`);
   };
 
   return (
@@ -184,25 +135,7 @@ const User = (user: UserProps) => {
                 <span style={{ color: "red" }}>{errors.password?.message}</span>
               )}
             </div>
-            <div>
-              <Image width={100} height={100} src={`${user.image}`}></Image>
-            </div>
           </div>
-          {user.image && (
-            <Image
-              src={createObjUrl}
-              // src={createObjUrl}
-              width={100}
-              height={100}
-              className="h-auto max-w-xl rounded-lg shadow-xl dark:shadow-gray-800 bg-gray"
-            ></Image>
-          )}
-          <input
-            ref={inputRef}
-            type="file"
-            onChange={onFileInputChange}
-            accept="image/*"
-          />
 
           <div className="md:flex md:items-center">
             <div className="md:w-1/3"></div>

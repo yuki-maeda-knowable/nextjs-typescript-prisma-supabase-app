@@ -2,19 +2,11 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
-import { useRef, useState } from "react";
-import { storage } from "../../helpers/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface UserInput {
   name: String;
   email: String;
   password: String;
-  image: String;
-}
-interface profileImage {
-  createObjUrl: string; //画像のpreview表示用
 }
 
 export default function UserForm() {
@@ -22,6 +14,8 @@ export default function UserForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    resetField,
     formState: { errors },
   } = useForm<UserInput>({
     defaultValues: {
@@ -31,98 +25,36 @@ export default function UserForm() {
     },
   });
 
-  const inputRef = useRef<HTMLInputElement>();
-
-  const [image, setImage] = useState<any>();
-  const [createObjUrl, setCreateObjUrl] = useState<string>();
-
-  if (!createObjUrl) {
-    setCreateObjUrl("/images/sample.png");
-  }
-
-  // アップロード画像のプレビュー表示
-  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //画像の情報をfilesに格納
-    const { files } = e.target;
-    setCreateObjUrl(URL.createObjectURL(files[0]));
-    setImage(files[0]);
-    // setValueで'imageUrl'のvalueにセットしてあげる
-    // setValue("createObjUrl", URL.createObjectURL(files[0]));
-  };
-
   const submitUserRegister = async (input: UserInput) => {
-    if (!image) {
-      const defaultImage = process.env.NEXT_PUBLIC_DEFAULT_IMG;
+    const formData = {
+      name: input.name,
+      email: input.email,
+      password: input.password,
+    };
 
-      const formData = {
-        name: input.name,
-        email: input.email,
-        password: input.password,
-        image: defaultImage,
-      };
+    try {
+      const res = await fetch("/api/user", {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      // json形式で返す
+      const data = await res.json();
+      const email = data.email;
+      //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
+      const password = formData.password;
+      //sign In()でそのままログイン
 
-      try {
-        const res = await fetch("/api/user", {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        // json形式で返す
-        const data = await res.json();
-        const email = data.email;
-        //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
-        const password = formData.password;
-        //sign In()でそのままログイン
-
-        await signIn("credentials", {
-          email,
-          password,
-          callbackUrl: "/",
-          redirect: true,
-        });
-      } catch (error) {
-        console.error("Error registering user:", error);
-      }
-    } else {
-      // Create a reference to 'images/mountains.jpg'
-      const mountainImagesRef = ref(storage, "images/" + image.name);
-      // 'file' comes from the Blob or File API
-      await uploadBytes(mountainImagesRef, image);
-      const objUrl = await getDownloadURL(mountainImagesRef);
-
-      const formData = {
-        name: input.name,
-        email: input.email,
-        password: input.password,
-        image: createObjUrl,
-      };
-
-      try {
-        const res = await fetch("/api/user", {
-          method: "POST",
-          body: JSON.stringify(formData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        // json形式で返す
-        const data = await res.json();
-        const email = data.email;
-        //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
-        const password = formData.password;
-        //sign In()でそのままログイン
-
-        await signIn("credentials", {
-          email,
-          password,
-          callbackUrl: "/",
-          redirect: true,
-        });
-      } catch (error) {
-        console.error("Error registering user:", error);
-      }
+      await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: "/",
+        redirect: true,
+      });
+    } catch (error) {
+      console.error("Error registering user:", error);
     }
   };
 
@@ -199,21 +131,9 @@ export default function UserForm() {
           </div>
         </div>
 
-        <Image
-          src={createObjUrl}
-          // src={createObjUrl}
-          width={100}
-          height={100}
-          className="h-auto max-w-xl rounded-lg shadow-xl dark:shadow-gray-800 bg-gray"
-        ></Image>
-        <input
-          ref={inputRef}
-          type="file"
-          onChange={onFileInputChange}
-          accept="image/*"
-        />
-
         <div className="md:flex md:items-center">
+          <div className="md:w-1/3"></div>
+
           <div className="md:w-2/3">
             <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
               <Link href={`/`}>Home</Link>

@@ -16,7 +16,7 @@ export default async function handler(
     });
     return res.status(200).json({ message: "ユーザ削除OK" });
   } else if (req.method === "PUT") {
-    const { name, email, password, image } = req.body;
+    const { name, email, password } = req.body;
     const hash_password = await hash(password, 10);
 
     const { id } = req.query;
@@ -28,7 +28,6 @@ export default async function handler(
         name: name,
         email: email,
         password: hash_password,
-        image: image,
       },
     });
     return res.status(200).json({ message: "更新OK" });
