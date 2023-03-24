@@ -3,13 +3,13 @@ import { PostProps } from "../Post";
 import Link from "next/link";
 import { useRouter } from "next/router";
 export type UserProps = {
-  id: String;
-  name: String;
-  email: String;
-  password: String;
-  image?: String;
-  createdAt?: String;
-  updatedAt?: String;
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  image?: string;
+  createdAt?: string;
+  updatedAt?: string;
   posts?: PostProps[];
 };
 
@@ -17,7 +17,7 @@ const User: React.FC<{ user: UserProps }> = ({ user }) => {
   const router = useRouter();
 
   //ユーザ削除
-  async function userDelete(id: String) {
+  async function userDelete(id: string) {
     const res = await fetch(`/api/user/${id}`, {
       method: "DELETE",
     });

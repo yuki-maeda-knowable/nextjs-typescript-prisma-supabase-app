@@ -25,10 +25,10 @@ export default async function handler(
         id: String(id),
       },
       data: {
-        name: String(name),
-        email: String(email),
-        password: String(hash_password),
-        image: String(image),
+        name: name,
+        email: email,
+        password: hash_password,
+        image: image,
       },
     });
     return res.status(200).json({ message: "更新OK" });

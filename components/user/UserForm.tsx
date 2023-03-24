@@ -8,10 +8,10 @@ import { storage } from "../../helpers/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface UserInput {
-  name: String;
-  email: String;
-  password: String;
-  image: String;
+  name: string;
+  email: string;
+  password: string;
+  image: string;
 }
 interface profileImage {
   createObjUrl: string; //画像のpreview表示用
@@ -33,7 +33,7 @@ export default function UserForm() {
 
   const inputRef = useRef<HTMLInputElement>();
 
-  const [image, setImage] = useState<any>();
+  const [image, setImage] = useState<File>();
   const [createObjUrl, setCreateObjUrl] = useState<string>();
 
   if (!createObjUrl) {
@@ -96,7 +96,7 @@ export default function UserForm() {
         name: input.name,
         email: input.email,
         password: input.password,
-        image: createObjUrl,
+        image: objUrl,
       };
 
       try {
@@ -201,7 +201,6 @@ export default function UserForm() {
 
         <Image
           src={createObjUrl}
-          // src={createObjUrl}
           width={100}
           height={100}
           className="h-auto max-w-xl rounded-lg shadow-xl dark:shadow-gray-800 bg-gray"

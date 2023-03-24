@@ -18,11 +18,7 @@ interface UserInput {
   image?: String;
 }
 
-type image = File; //画像の保存用
-type createObjUrl = any; //画像のpreview表示用
-// interface profileImage {
-//   createObjUrl: string;
-// }
+type createObjUrl = string; //画像のpreview表示用
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const data = await prisma.user.findUnique({
@@ -56,7 +52,7 @@ const User = (user: UserProps) => {
   const { id } = router.query;
   const inputRef = useRef<HTMLInputElement>();
 
-  const [image, setImage] = useState<image>();
+  const [image, setImage] = useState<File>();
   const [createObjUrl, setCreateObjUrl] = useState<createObjUrl>();
 
   // アップロード画像のプレビュー表示
