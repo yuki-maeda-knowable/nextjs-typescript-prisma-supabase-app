@@ -7,7 +7,7 @@ export type UserProps = {
   name: String;
   email: String;
   password: String;
-  image: String;
+  image?: String;
   createdAt?: String;
   updatedAt?: String;
   posts?: PostProps[];
