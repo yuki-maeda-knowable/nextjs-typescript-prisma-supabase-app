@@ -7,13 +7,14 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { name, email, password } = req.body;
+    const { name, email, password, image } = req.body;
     const hash_password = await hash(password, 10);
     const data = await prisma.user.create({
       data: {
         name: name,
         email: email,
         password: hash_password,
+        image: image,
       },
     });
     return res.status(200).json(data);

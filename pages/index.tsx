@@ -10,12 +10,10 @@ import PostSearchForm from "../components/post/postSearchForm";
 type Props = {
   feed: PostProps[];
   keyword: string;
-  sample: string;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { keyword } = context.query;
-
   // 検索ワードが配列になっちゃうから、一旦文字列に変換
   const keywordString: string = Array.isArray(keyword) ? keyword[0] : keyword;
   const feed = await prisma.post.findMany({
@@ -65,7 +63,7 @@ const Blog = (props: Props) => {
               className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
               type="button"
             >
-              <Link href={`/users`}>ユーザ一覧</Link>
+              <Link href={`/users/${session?.user?.id}`}>profile</Link>
             </button>
           </div>
           <div className="text-right">
