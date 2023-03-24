@@ -72,20 +72,7 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    //tokenをuseridにして、
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    // sessionのuser.idにidを代入 *こうしないとDBに格納しているuserのIDが取得できなかった
-    async session({ session, token }) {
-      session.user.id = token.id;
-      return session;
-    },
-  },
+  callbacks: {},
 };
 
 export default NextAuth(authOptions);
