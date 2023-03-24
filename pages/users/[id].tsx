@@ -9,7 +9,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { storage } from "../../helpers/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import defaultImage from "../../public/images/sample.png";
 interface UserInput {
   id: String;
   name: String;
@@ -17,9 +17,13 @@ interface UserInput {
   password: String;
   image?: String;
 }
-interface profileImage {
-  createObjUrl: string; //画像のpreview表示用
-}
+
+type image = File; //画像の保存用
+type createObjUrl = string; //画像のpreview表示用
+// interface profileImage {
+//   createObjUrl: string;
+// }
+
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const data = await prisma.user.findUnique({
     where: {
@@ -52,12 +56,9 @@ const User = (user: UserProps) => {
   const { id } = router.query;
   const inputRef = useRef<HTMLInputElement>();
 
-  const [image, setImage] = useState<any>();
-  const [createObjUrl, setCreateObjUrl] = useState<string>();
+  const [image, setImage] = useState<image>();
+  const [createObjUrl, setCreateObjUrl] = useState<createObjUrl>();
 
-  if (!createObjUrl) {
-    setCreateObjUrl("/images/sample.png");
-  }
   // アップロード画像のプレビュー表示
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     //画像の情報をfilesに格納
@@ -190,8 +191,7 @@ const User = (user: UserProps) => {
           </div>
           {user.image && (
             <Image
-              src={createObjUrl}
-              // src={createObjUrl}
+              src={createObjUrl ? createObjUrl : defaultImage}
               width={100}
               height={100}
               className="h-auto max-w-xl rounded-lg shadow-xl dark:shadow-gray-800 bg-gray"
