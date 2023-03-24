@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import DefaultImage from "../../pubilc/images/images.png";
+import DefaultImage from "../../public/images/images.png";
 import Image, { StaticImageData } from "next/image";
 import { useState, useRef } from "react";
 import { supabase } from "../../lib/supabase";
