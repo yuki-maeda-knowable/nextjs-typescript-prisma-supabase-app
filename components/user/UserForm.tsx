@@ -2,34 +2,63 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import DefaultImage from "../../pubilc/images/images.png";
+import Image, { StaticImageData } from "next/image";
+import { useState, useRef } from "react";
+import { supabase } from "../../lib/supabase";
 
 interface UserInput {
-  name: String;
-  email: String;
-  password: String;
+  name: string;
+  email: string;
+  password: string;
+  image?: string | StaticImageData;
 }
 
+type uploadImageUrl = string;
+
 export default function UserForm() {
+  const [uploadImageUrl, setUploadImageUrl] = useState<uploadImageUrl>();
+  const [uploadImageFile, setUploadImageFile] = useState<File>();
   const router = useRouter();
   const {
     register,
     handleSubmit,
-    watch,
-    resetField,
     formState: { errors },
   } = useForm<UserInput>({
     defaultValues: {
       name: "",
       email: "",
       password: "",
+      image: DefaultImage,
     },
   });
 
+  // const inputRef = useRef<HTMLInputElement>();
+  // 画像が選択されたら、プレビュー
+  const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
+    setUploadImageUrl(URL.createObjectURL(files[0]));
+    setUploadImageFile(files[0]);
+  };
+
   const submitUserRegister = async (input: UserInput) => {
+    //supabaseに画像をアップロード
+    const { data, error } = await supabase.storage
+      .from("photos")
+      .upload("user/" + uploadImageFile.name, uploadImageFile);
+
+    //supabaseから画像のURLをDL
+    const url = await supabase.storage
+      .from("photos")
+      .getPublicUrl(JSON.stringify(data));
+    const { publicUrl } = url.data;
+
+    // DLしたURLをimageに格納
     const formData = {
       name: input.name,
       email: input.email,
       password: input.password,
+      image: publicUrl,
     };
 
     try {
@@ -131,9 +160,23 @@ export default function UserForm() {
           </div>
         </div>
 
-        <div className="md:flex md:items-center">
-          <div className="md:w-1/3"></div>
+        <Image
+          src={uploadImageUrl ? uploadImageUrl : DefaultImage}
+          width={100}
+          height={100}
+        ></Image>
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Upload file
+        </label>
+        <input
+          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          id="file_input"
+          type="file"
+          onChange={onChangeFile}
+          // ref={inputRef}
+        />
 
+        <div className="md:flex md:items-center">
           <div className="md:w-2/3">
             <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
               <Link href={`/`}>Home</Link>
