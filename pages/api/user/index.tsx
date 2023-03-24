@@ -8,7 +8,6 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const { name, email, password, image } = req.body;
-    console.log(req.body);
 
     const hash_password = await hash(password, 10);
     const data = await prisma.user.create({

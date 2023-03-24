@@ -2,11 +2,12 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import DefaultImage from "../../public/images/images.png";
 import Image, { StaticImageData } from "next/image";
 import { useState, useRef } from "react";
 import { supabase } from "../../lib/supabase";
-
+import crypto from "crypto";
+// ユーザのデフォルト画像
+const defaultImg = process.env.NEXT_PUBLIC_DEFAULT_IMG;
 interface UserInput {
   name: string;
   email: string;
@@ -29,7 +30,7 @@ export default function UserForm() {
       name: "",
       email: "",
       password: "",
-      image: DefaultImage,
+      image: defaultImg,
     },
   });
 
@@ -42,48 +43,92 @@ export default function UserForm() {
   };
 
   const submitUserRegister = async (input: UserInput) => {
-    //supabaseに画像をアップロード
-    const { data, error } = await supabase.storage
-      .from("photos")
-      .upload("user/" + uploadImageFile.name, uploadImageFile);
+    //画像があるか判断
+    if (uploadImageFile) {
+      const randomString = crypto.randomBytes(10).toString("hex");
 
-    //supabaseから画像のURLをDL
-    const url = await supabase.storage
-      .from("photos")
-      .getPublicUrl(JSON.stringify(data));
-    const { publicUrl } = url.data;
+      // あれば、supabaseに画像をアップロード
+      const { data, error } = await supabase.storage
+        .from("photos")
+        .upload(
+          "user/" + randomString + "-" + uploadImageFile.name,
+          uploadImageFile
+        );
+      console.log(data);
 
-    // DLしたURLをimageに格納
-    const formData = {
-      name: input.name,
-      email: input.email,
-      password: input.password,
-      image: publicUrl,
-    };
+      //supabaseから画像のURLをDL
+      const url = await supabase.storage.from("photos").getPublicUrl(data.path);
+      const { publicUrl } = url.data;
 
-    try {
-      const res = await fetch("/api/user", {
-        method: "POST",
-        body: JSON.stringify(formData),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      // json形式で返す
-      const data = await res.json();
-      const email = data.email;
-      //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
-      const password = formData.password;
-      //sign In()でそのままログイン
+      // DLしたURLをimageに格納
+      const formData = {
+        name: input.name,
+        email: input.email,
+        password: input.password,
+        image: publicUrl,
+      };
 
-      await signIn("credentials", {
-        email,
-        password,
-        callbackUrl: "/",
-        redirect: true,
-      });
-    } catch (error) {
-      console.error("Error registering user:", error);
+      try {
+        const res = await fetch("/api/user", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        // json形式で返す
+        const data = await res.json();
+        const email = data.email;
+        //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
+        const password = formData.password;
+        //sign In()でそのままログイン
+
+        await signIn("credentials", {
+          email,
+          password,
+          callbackUrl: "/",
+          redirect: true,
+        });
+      } catch (error) {
+        console.error("Error registering user:", error);
+      }
+    } else {
+      // なければ、デフォルトの画像を登録
+      //supabaseから画像のURLをDL
+      const publicUrl = defaultImg;
+
+      // DLしたURLをimageに格納
+      const formData = {
+        name: input.name,
+        email: input.email,
+        password: input.password,
+        image: publicUrl,
+      };
+
+      try {
+        const res = await fetch("/api/user", {
+          method: "POST",
+          body: JSON.stringify(formData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        // json形式で返す
+        const data = await res.json();
+        const email = data.email;
+        //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
+        const password = formData.password;
+        //sign In()でそのままログイン
+
+        await signIn("credentials", {
+          email,
+          password,
+          callbackUrl: "/",
+          redirect: false,
+        });
+      } catch (error) {
+        console.error("Error registering user:", error);
+      }
     }
   };
 
@@ -161,7 +206,7 @@ export default function UserForm() {
         </div>
 
         <Image
-          src={uploadImageUrl ? uploadImageUrl : DefaultImage}
+          src={uploadImageUrl ? uploadImageUrl : defaultImg}
           width={100}
           height={100}
         ></Image>
@@ -173,7 +218,6 @@ export default function UserForm() {
           id="file_input"
           type="file"
           onChange={onChangeFile}
-          // ref={inputRef}
         />
 
         <div className="md:flex md:items-center">

@@ -3,12 +3,13 @@ import { PostProps } from "../Post";
 import Link from "next/link";
 import { useRouter } from "next/router";
 export type UserProps = {
-  id: String;
-  name: String;
-  email: String;
-  password: String;
-  createdAt?: String;
-  updatedAt?: String;
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  password: string;
+  createdAt?: string;
+  updatedAt?: string;
   posts?: PostProps[];
 };
 
