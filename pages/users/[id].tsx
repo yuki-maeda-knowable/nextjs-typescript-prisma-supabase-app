@@ -15,7 +15,7 @@ interface UserInput {
   name: String;
   email: String;
   password: String;
-  image: String;
+  image?: String;
 }
 interface profileImage {
   createObjUrl: string; //画像のpreview表示用
