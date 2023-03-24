@@ -28,7 +28,7 @@ export default async function handler(
         name: name,
         email: email,
         password: hash_password,
-        image: image,
+        image: String(image),
       },
     });
     return res.status(200).json({ message: "更新OK" });
