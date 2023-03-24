@@ -68,19 +68,15 @@ const User = (user: UserProps) => {
     // setValue("createObjUrl", URL.createObjectURL(files[0]));
   };
   const submitUserUpdate = async (input: UserInput) => {
+    // 画像が未選択
     if (!image) {
       const { name, email, password } = input;
-      // Create a reference to 'images/mountains.jpg'
-      // const mountainImagesRef = ref(storage, "images/" + image.name);
-      // // 'file' comes from the Blob or File API
-      // await uploadBytes(mountainImagesRef, image);
-      // const objUrl = await getDownloadURL(mountainImagesRef);
-
+      const objUrl = user.image;
       const formData = {
         name: name,
         email: email,
         password: password,
-        // image: objUrl,
+        image: objUrl,
       };
       const res = await fetch(`/api/user/${id}`, {
         method: "PUT",
@@ -90,7 +86,9 @@ const User = (user: UserProps) => {
         body: JSON.stringify(formData),
       });
       router.push(`/users/${id}`);
-    } else {
+    }
+    // 画像が選択されてたら
+    else {
       const { name, email, password } = input;
       // Create a reference to 'images/mountains.jpg'
       const mountainImagesRef = ref(storage, "images/" + image.name);
