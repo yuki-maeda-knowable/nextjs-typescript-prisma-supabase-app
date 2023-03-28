@@ -1,11 +1,22 @@
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
-import Image, { StaticImageData } from "next/image";
-import { useState, useRef } from "react";
+import { StaticImageData } from "next/image";
+import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import crypto from "crypto";
+import Layout from "../Layout";
+import {
+  Container,
+  Stack,
+  Typography,
+  TextField,
+  Avatar,
+  Box,
+  IconButton,
+  Button,
+} from "@mui/material";
+import { AddAPhoto } from "@mui/icons-material";
+
 // ユーザのデフォルト画像
 const defaultImg = process.env.NEXT_PUBLIC_DEFAULT_IMG;
 interface UserInput {
@@ -20,7 +31,7 @@ type uploadImageUrl = string;
 export default function UserForm() {
   const [uploadImageUrl, setUploadImageUrl] = useState<uploadImageUrl>();
   const [uploadImageFile, setUploadImageFile] = useState<File>();
-  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -54,10 +65,10 @@ export default function UserForm() {
           "user/" + randomString + "-" + uploadImageFile.name,
           uploadImageFile
         );
-      console.log(data);
 
       //supabaseから画像のURLをDL
       const url = await supabase.storage.from("photos").getPublicUrl(data.path);
+
       const { publicUrl } = url.data;
 
       // DLしたURLをimageに格納
@@ -77,6 +88,8 @@ export default function UserForm() {
           },
         });
         // json形式で返す
+        console.log(res);
+
         const data = await res.json();
         const email = data.email;
         //登録済みのデータを使用するとhash化したpasswordを利用してしまうため、formに入力されたpasswordを使用
@@ -133,109 +146,96 @@ export default function UserForm() {
   };
 
   return (
-    <div>
-      <h3>ユーザー登録</h3>
+    <Layout>
+      <Container>
+        <Typography
+          variant="h6"
+          color="gray"
+          sx={{ textAlign: "center", m: 2 }}
+        >
+          ユーザー登録
+        </Typography>
 
-      <form
-        onSubmit={handleSubmit(submitUserRegister)}
-        className="w-full max-w-sm"
-      >
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Name
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("name", { required: "入力必須だよ" })}
+        <Stack
+          component="form"
+          onSubmit={handleSubmit(submitUserRegister)}
+          alignItems="center"
+        >
+          <Stack direction={"row"}>
+            <Avatar
+              sx={{ width: 80, height: 80 }}
+              src={uploadImageUrl ? uploadImageUrl : ""}
+            ></Avatar>
+            <IconButton
+              color="default"
+              aria-label="upload picture"
+              component="label"
+            >
+              <input
+                hidden
+                accept="image/*"
+                type="file"
+                onChange={onChangeFile}
+              />
+              <AddAPhoto />
+            </IconButton>
+          </Stack>
+          <Box>
+            <TextField
+              sx={{ width: 300, marginBottom: 2 }}
+              {...register("name", { required: "入力必須" })}
+              label="name"
+              type="text"
+              variant="standard"
               placeholder="name"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-full-name"
             />
             {errors.name && (
               <span style={{ color: "red" }}>{errors.name?.message}</span>
             )}
-          </div>
-        </div>
-
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Email
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("email", { required: "入力必須だよ" })}
-              placeholder="***@***.**"
+            <TextField
+              sx={{ width: 300, marginBottom: 2 }}
+              {...register("email", { required: "入力必須" })}
+              label="email"
               type="email"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
+              variant="standard"
+              placeholder="example@example.jp"
             />
             {errors.email && (
               <span style={{ color: "red" }}>{errors.email?.message}</span>
             )}
-          </div>
-        </div>
-
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Password
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
+            <TextField
+              sx={{ width: 300, marginBottom: 2 }}
               {...register("password", {
-                required: "入力必須だよ",
+                required: "入力必須",
                 minLength: {
                   value: 8,
-                  message: "8文字以上ね",
+                  message: "8文字以上入力してください",
                 },
               })}
+              id="standard-search"
+              label="password"
               type="password"
-              placeholder="********"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
+              variant="standard"
+              placeholder="password"
             />
             {errors.password && (
               <span style={{ color: "red" }}>{errors.password?.message}</span>
             )}
-          </div>
-        </div>
-
-        <Image
-          src={uploadImageUrl ? uploadImageUrl : defaultImg}
-          width={100}
-          height={100}
-        ></Image>
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-          Upload file
-        </label>
-        <input
-          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-          id="file_input"
-          type="file"
-          onChange={onChangeFile}
-        />
-
-        <div className="md:flex md:items-center">
-          <div className="md:w-2/3">
-            <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
-              <Link href={`/`}>Home</Link>
-            </button>
-          </div>
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            <Button
+              variant="contained"
+              sx={{
+                color: "whitesmoke",
+                bgcolor: "background.default",
+                ":hover": { bgcolor: "gray" },
+                m: 2,
+              }}
               type="submit"
             >
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+              send
+            </Button>
+          </Box>
+        </Stack>
+      </Container>
+    </Layout>
   );
 }

@@ -5,10 +5,21 @@ import Layout from "../../components/Layout";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import crypto from "crypto";
+import {
+  Container,
+  Typography,
+  Stack,
+  Avatar,
+  IconButton,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
+import { AddAPhoto } from "@mui/icons-material";
+import { useSession } from "next-auth/react";
 
 interface UserInput {
   id: string;
@@ -26,15 +37,14 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       id: String(params?.id),
     },
   });
-
   const user = await JSON.parse(JSON.stringify(data));
-
   return {
     props: user,
   };
 };
 
 const User = (user: UserProps) => {
+  const { data: session } = useSession();
   const {
     register,
     handleSubmit,
@@ -124,112 +134,117 @@ const User = (user: UserProps) => {
     }
   };
 
+  if (!session) {
+    return (
+      <Layout>
+        <Typography variant="h6" color={"whitesmoke"}>
+          ログインして
+        </Typography>
+      </Layout>
+    );
+  }
   return (
     <Layout>
-      <h2>User Detail</h2>
-      <div className="md:flex md:items-right mb-6">
-        <div className="md:w-1/3 md:items-right">
-          <Image src={user.image} width={100} height={100}></Image>
-        </div>
-      </div>
-      <form
-        onSubmit={handleSubmit(submitUserUpdate)}
-        className="w-full max-w-sm"
-      >
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Name
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("name", { required: "入力必須だよ" })}
-              placeholder="name"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-full-name"
-            />
-            {errors.name && (
-              <span style={{ color: "red" }}>{errors.name?.message}</span>
-            )}
-          </div>
-        </div>
+      <Container>
+        <Typography
+          variant="h6"
+          color="gray"
+          sx={{ textAlign: "center", m: 2 }}
+        >
+          profile
+        </Typography>
 
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Email
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("email", { required: "入力必須だよ" })}
-              placeholder="***@***.**"
-              type="email"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
-            />
-            {errors.email && (
-              <span style={{ color: "red" }}>{errors.email?.message}</span>
-            )}
-          </div>
-        </div>
-
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Password
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("password", {
-                required: "入力必須だよ",
-                minLength: {
-                  value: 8,
-                  message: "8文字以上ね",
-                },
-              })}
-              type="password"
-              placeholder="********"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
-            />
-            {errors.password && (
-              <span style={{ color: "red" }}>{errors.password?.message}</span>
-            )}
-          </div>
-        </div>
-
-        <Image
-          src={uploadImageUrl ? uploadImageUrl : user.image}
-          width={100}
-          height={100}
-        ></Image>
-        <input
-          className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-          id="file_input"
-          type="file"
-          onChange={onChangeFile}
-        />
-        <div className="md:flex md:items-center">
-          <div className="md:w-1/3"></div>
-
-          <div className="md:w-2/3">
-            <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
-              <Link href={`/users`}>キャンセル</Link>
-            </button>
-          </div>
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+        <Stack
+          component="form"
+          onSubmit={handleSubmit(submitUserUpdate)}
+          alignItems="center"
+        >
+          <Stack direction={"row"}>
+            <Avatar
+              sx={{ width: 80, height: 80 }}
+              src={uploadImageUrl ? uploadImageUrl : ""}
+            ></Avatar>
+            <IconButton
+              color="default"
+              aria-label="upload picture"
+              component="label"
+            >
+              <input
+                hidden
+                accept="image/*"
+                type="file"
+                onChange={onChangeFile}
+              />
+              <AddAPhoto />
+            </IconButton>
+          </Stack>
+          <TextField
+            sx={{ width: 300, marginBottom: 2 }}
+            {...register("name", { required: "入力必須" })}
+            label="name"
+            type="text"
+            variant="standard"
+            placeholder="name"
+          />
+          {errors.name && (
+            <span style={{ color: "red" }}>{errors.name?.message}</span>
+          )}
+          <TextField
+            sx={{ width: 300, marginBottom: 2 }}
+            {...register("email", { required: "入力必須" })}
+            label="email"
+            type="email"
+            variant="standard"
+            placeholder="example@example.jp"
+          />
+          {errors.email && (
+            <span style={{ color: "red" }}>{errors.email?.message}</span>
+          )}
+          <TextField
+            sx={{ width: 300, marginBottom: 2 }}
+            {...register("password", {
+              required: "入力必須",
+              minLength: {
+                value: 8,
+                message: "8文字以上入力してください",
+              },
+            })}
+            id="standard-search"
+            label="password"
+            type="password"
+            variant="standard"
+            placeholder="password"
+          />
+          {errors.password && (
+            <span style={{ color: "red" }}>{errors.password?.message}</span>
+          )}
+          <Box>
+            <Button
+              variant="contained"
+              sx={{
+                color: "whitesmoke",
+                bgcolor: "background.default",
+                ":hover": { bgcolor: "gray" },
+                m: 2,
+              }}
+            >
+              <Link href={`/`}>Home</Link>
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                color: "whitesmoke",
+                bgcolor: "background.default",
+                ":hover": { bgcolor: "gray" },
+                m: 2,
+              }}
               type="submit"
             >
-              Update
-            </button>
-          </div>
-        </div>
-      </form>
+              update
+            </Button>
+          </Box>
+        </Stack>
+      </Container>
     </Layout>
   );
 };

@@ -1,7 +1,17 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { signIn } from "next-auth/react";
+import Layout from "../Layout";
+import {
+  Container,
+  Typography,
+  Stack,
+  Avatar,
+  IconButton,
+  TextField,
+  Button,
+} from "@mui/material";
+import { AddAPhoto } from "@mui/icons-material";
 
 interface UserInput {
   email: String;
@@ -39,77 +49,64 @@ export default function SignInForm() {
   };
 
   return (
-    <div>
-      <h3>sign in</h3>
+    <Layout>
+      <Container>
+        <Typography
+          variant="h6"
+          color="gray"
+          sx={{ textAlign: "center", m: 2 }}
+        >
+          Log In
+        </Typography>
 
-      <form
-        onSubmit={handleSubmit(submitUserSignIn)}
-        className="w-full max-w-sm"
-      >
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Email
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("email", { required: "入力必須だよ" })}
-              placeholder="example@example.com"
-              type="email"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
-            />
-            {errors.email && (
-              <span style={{ color: "red" }}>{errors.email?.message}</span>
-            )}
-          </div>
-        </div>
-
-        <div className="md:flex md:items-center mb-6">
-          <div className="md:w-1/3">
-            <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4">
-              Password
-            </label>
-          </div>
-          <div className="md:w-2/3">
-            <input
-              {...register("password", {
-                required: "入力必須だよ",
-                minLength: {
-                  value: 8,
-                  message: "8文字以上ね",
-                },
-              })}
-              type="password"
-              placeholder="********"
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-              id="inline-password"
-            />
-            {errors.password && (
-              <span style={{ color: "red" }}>{errors.password?.message}</span>
-            )}
-          </div>
-        </div>
-
-        <div className="md:flex md:items-center">
-          <div className="md:w-1/3"></div>
-
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-              type="submit"
-            >
-              Sign In
-            </button>
-          </div>
-        </div>
-      </form>
-      <div className="md:w-2/3">
-        <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
-          <Link href={`/`}>Home</Link>
-        </button>
-      </div>
-    </div>
+        <Stack
+          component="form"
+          onSubmit={handleSubmit(submitUserSignIn)}
+          alignItems="center"
+        >
+          <TextField
+            sx={{ width: 300, marginBottom: 2 }}
+            {...register("email", { required: "入力必須" })}
+            label="email"
+            type="email"
+            variant="standard"
+            placeholder="example@example.jp"
+          />
+          {errors.email && (
+            <span style={{ color: "red" }}>{errors.email?.message}</span>
+          )}
+          <TextField
+            sx={{ width: 300, marginBottom: 2 }}
+            {...register("password", {
+              required: "入力必須",
+              minLength: {
+                value: 8,
+                message: "8文字以上入力してください",
+              },
+            })}
+            id="standard-search"
+            label="password"
+            type="password"
+            variant="standard"
+            placeholder="password"
+          />
+          {errors.password && (
+            <span style={{ color: "red" }}>{errors.password?.message}</span>
+          )}
+          <Button
+            variant="contained"
+            sx={{
+              color: "whitesmoke",
+              bgcolor: "background.default",
+              ":hover": { bgcolor: "gray" },
+              m: 2,
+            }}
+            type="submit"
+          >
+            Log in
+          </Button>
+        </Stack>
+      </Container>
+    </Layout>
   );
 }

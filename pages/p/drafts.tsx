@@ -1,8 +1,22 @@
 import Layout from "../../components/Layout";
 import prisma from "../../lib/prisma";
-import Post, { PostProps } from "../../components/Post";
+import { PostProps } from "../../components/Post";
 import { getSession, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
+import {
+  Typography,
+  Box,
+  Card,
+  CardHeader,
+  Avatar,
+  CardContent,
+  CardActions,
+  IconButton,
+  Checkbox,
+  Button,
+} from "@mui/material";
+import { FavoriteBorder, Favorite, Share } from "@mui/icons-material";
+import { useRouter } from "next/router";
 
 interface Drafts {
   drafts: PostProps[];
@@ -36,8 +50,16 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 };
 
 const Drafts = (props: Drafts) => {
+  const router = useRouter();
   const { data: session } = useSession();
+  async function handlePublish(id: string): Promise<void> {
+    const res = await fetch(`/api/post/${id}`, {
+      method: "PUT",
+    });
+    console.log(res);
 
+    router.push("/");
+  }
   if (!session) {
     return (
       <Layout>
@@ -47,33 +69,55 @@ const Drafts = (props: Drafts) => {
     );
   }
 
+  if (props.drafts.length === 0) {
+    return (
+      <Layout>
+        <Typography variant="h6" sx={{ color: "whitesmoke" }}>
+          No Draft
+        </Typography>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <h1>Drafts</h1>
-      <div className="page">
-        <h1>My Drafts</h1>
-        <main>
-          {props.drafts.map((post) => (
-            <div key={post.id} className="post">
-              <Post post={post} />
-            </div>
-          ))}
-        </main>
-      </div>
-      <style jsx>{`
-        .post {
-          background: var(--geist-background);
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
+      <Typography variant="h5" sx={{ color: "whitesmoke" }}>
+        My Drafts
+      </Typography>
+      <Box>
+        {props.drafts.map((post) => (
+          <Card key={post.id} sx={{ margin: 3 }}>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
+                  A
+                </Avatar>
+              }
+              title={post.title}
+              subheader="September 14, 2016"
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                {post.content}
+              </Typography>
+            </CardContent>
+            <CardActions disableSpacing>
+              <IconButton aria-label="add to favorites">
+                <Checkbox
+                  icon={<FavoriteBorder />}
+                  checkedIcon={<Favorite sx={{ color: "red" }} />}
+                />
+              </IconButton>
+              <IconButton aria-label="share">
+                <Share />
+              </IconButton>
+            </CardActions>
+            {!post.published && (
+              <Button onClick={() => handlePublish(post.id)}>公開</Button>
+            )}
+          </Card>
+        ))}
+      </Box>
     </Layout>
   );
 };
