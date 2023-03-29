@@ -5,6 +5,7 @@ import {
   AppBar,
   Avatar,
   Box,
+  Button,
   Container,
   IconButton,
   MenuItem,
@@ -57,6 +58,9 @@ const Header: React.FC = () => {
             <PostSearchForm />
           </Search>
 
+          <Button>
+            <Link href={`/profile/1`}>profile</Link>
+          </Button>
           {!session && (
             <Box sx={{ flexGrow: 1 }}>
               <Stack direction={"row"} justifyContent="flex-end">
@@ -79,7 +83,7 @@ const Header: React.FC = () => {
               <Tooltip title="User Settings">
                 <IconButton sx={{ p: 0 }}>
                   <Link href={`/users/${session?.user?.id}`}>
-                    <Avatar alt="User Icon" src="" />
+                    <Avatar alt="User Icon" src={session?.user?.image} />
                   </Link>
                 </IconButton>
               </Tooltip>

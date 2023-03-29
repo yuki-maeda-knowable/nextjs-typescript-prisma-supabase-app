@@ -40,7 +40,7 @@ const UserBox = styled(Box)({
 export default function PostAdd() {
   const { data: session } = useSession();
   const router = useRouter();
-  const userImg = session.user.image;
+  const userImg = session?.user?.image;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -123,7 +123,7 @@ export default function PostAdd() {
           <UserBox>
             <Avatar sx={{ width: 30, height: 30 }} src={userImg} />
             <Typography variant="body1" fontWeight={500}>
-              {session.user.name}
+              {session?.user?.name}
             </Typography>
           </UserBox>
           <TextField
