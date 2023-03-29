@@ -30,6 +30,7 @@ model User {
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
+  profile       Profile?
   @@map(name: "users")
 }
 model Account {
@@ -65,4 +66,21 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Profile {
+  id String @default(cuid()) @id
+  nickname String
+  gender Int //1: 女 2:男 3:その他
+  birthday DateTime
+  Photo Photo[]
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+}
+
+model Photo{
+  id String @id @default(cuid())
+  Profie Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+  url String?
 }
