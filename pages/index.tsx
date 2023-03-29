@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
-import Post, { PostProps } from "../components/Post";
+import { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
-import PostSearchForm from "../components/post/postSearchForm";
+import PostAdd from "./p/PostAdd";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Checkbox,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import { Favorite, FavoriteBorder, MoreVert, Share } from "@mui/icons-material";
 
 type Props = {
   feed: PostProps[];
@@ -52,46 +63,45 @@ const Blog = (props: Props) => {
       }
     };
     fetchData();
-  }, [props]);
+  }, [props.feed]);
 
   return (
     <Layout>
-      <div className="page">
-        <h1>Public Feed</h1>
-
-        <main>
-          <div className="md:w-2/3">
-            <button
-              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-1 px-3 rounded"
-              type="button"
-            >
-              <Link href={`/users`}>ユーザ一覧</Link>
-            </button>
-          </div>
-          <div className="text-right">
-            <PostSearchForm />
-          </div>
-          {props.feed.map((post) => (
-            <div key={post.id} className="post">
-              {session && <Post post={post} />}
-            </div>
-          ))}
-        </main>
-      </div>
-      <style jsx>{`
-        .post {
-          background: white;
-          transition: box-shadow 0.1s ease-in;
-        }
-
-        .post:hover {
-          box-shadow: 1px 1px 3px #aaa;
-        }
-
-        .post + .post {
-          margin-top: 2rem;
-        }
-      `}</style>
+      <Typography variant="h5" sx={{ color: "whitesmoke" }}>
+        Public Feed
+      </Typography>
+      <Box>
+        {props.feed.map((post) => (
+          <Card key={post.id} sx={{ margin: 3 }}>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
+                  A
+                </Avatar>
+              }
+              title={post.title}
+              subheader="September 14, 2016"
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                {post.content}
+              </Typography>
+            </CardContent>
+            <CardActions disableSpacing>
+              <IconButton aria-label="add to favorites">
+                <Checkbox
+                  icon={<FavoriteBorder />}
+                  checkedIcon={<Favorite sx={{ color: "red" }} />}
+                />
+              </IconButton>
+              <IconButton aria-label="share">
+                <Share />
+              </IconButton>
+            </CardActions>
+          </Card>
+        ))}
+      </Box>
+      <PostAdd />
     </Layout>
   );
 };

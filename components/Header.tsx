@@ -1,219 +1,97 @@
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession, getSession } from "next-auth/react";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  IconButton,
+  MenuItem,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import styled from "@emotion/styled";
+import PostSearchForm from "./post/postSearchForm";
 
 const Header: React.FC = () => {
-  const router = useRouter();
-  const isActive: (pathname: string) => boolean = (pathname) =>
-    router.pathname === pathname;
-
   const { data: session, status } = useSession();
 
-  let left = (
-    <div className="left">
-      <Link href="/">
-        <a className="bold" data-active={isActive("/")}>
-          Feed
-        </a>
-      </Link>
-      <style jsx>{`
-        .bold {
-          font-weight: bold;
-        }
+  const Search = styled(Box)({
+    backgroundColor: "background.default",
+    padding: "0 10px",
+    borderRadius: 10,
+    width: "30%",
+  });
 
-        a {
-          text-decoration: none;
-          color: var(--geist-foreground);
-          display: inline-block;
-        }
-
-        .left a[data-active="true"] {
-          color: gray;
-        }
-
-        a + a {
-          margin-left: 1rem;
-        }
-      `}</style>
-    </div>
-  );
-
-  let right = null;
-
-  if (status === "loading") {
-    left = (
-      <div className="left">
-        <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
-            Feed
-          </a>
-        </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          .left a[data-active="true"] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>Validating session ...</p>
-        <style jsx>{`
-          .right {
-            margin-left: auto;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  if (!session) {
-    right = (
-      <div className="right">
-        <button
-          onClick={() => {
-            signIn();
-          }}
-        >
-          Log in
-        </button>
-
-        <button>
-          <Link href={`/users/create`}>Sign Up</Link>
-        </button>
-
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid var(--geist-foreground);
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-        `}</style>
-      </div>
-    );
-  }
-
-  if (session) {
-    left = (
-      <div className="left">
-        <Link href="/">
-          <a className="bold" data-active={isActive("/")}>
-            Feed
-          </a>
-        </Link>
-        <Link href="/p/drafts">
-          <a data-active={isActive("/p/drafts")}>My drafts</a>
-        </Link>
-        <style jsx>{`
-          .bold {
-            font-weight: bold;
-          }
-
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          .left a[data-active="true"] {
-            color: gray;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-        `}</style>
-      </div>
-    );
-    right = (
-      <div className="right">
-        <p>
-          {session.user.name} ({session.user.email})
-        </p>
-        <Link href="/p/create">
-          <button>
-            <a>New post</a>
-          </button>
-        </Link>
-        <button onClick={() => signOut()}>
-          <a>Log out</a>
-        </button>
-        <style jsx>{`
-          a {
-            text-decoration: none;
-            color: var(--geist-foreground);
-            display: inline-block;
-          }
-
-          p {
-            display: inline-block;
-            font-size: 13px;
-            padding-right: 1rem;
-          }
-
-          a + a {
-            margin-left: 1rem;
-          }
-
-          .right {
-            margin-left: auto;
-          }
-
-          .right a {
-            border: 1px solid var(--geist-foreground);
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
-          }
-
-          button {
-            border: none;
-          }
-        `}</style>
-      </div>
-    );
-  }
+  const StyledToolbar = styled(Toolbar)({
+    display: "flex",
+    justifyContent: "space-between",
+  });
 
   return (
-    <nav>
-      {left}
-      {right}
-      <style jsx>{`
-        nav {
-          display: flex;
-          padding: 2rem;
-          align-items: center;
-        }
-      `}</style>
-    </nav>
+    <AppBar position="sticky">
+      <Container maxWidth="xl">
+        <StyledToolbar disableGutters>
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="/"
+            sx={{
+              mr: 2,
+              display: { xs: "none", sm: "flex" },
+              fontFamily: "monospace",
+              fontWeight: 700,
+              letterSpacing: ".3rem",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            LOGO
+          </Typography>
+
+          <Search sx={{ display: { xs: "none", sm: "flex" } }}>
+            <PostSearchForm />
+          </Search>
+
+          <Button>
+            <Link href={`/profile/1`}>profile</Link>
+          </Button>
+          {!session && (
+            <Box sx={{ flexGrow: 1 }}>
+              <Stack direction={"row"} justifyContent="flex-end">
+                <MenuItem onClick={() => signIn()}>Log In</MenuItem>
+                <MenuItem>
+                  <Link href={`/users/create`}>Sign Up</Link>
+                </MenuItem>
+              </Stack>
+            </Box>
+          )}
+          {session && (
+            <Box sx={{ flexGrow: 1 }}>
+              <Stack direction={"row"} justifyContent="flex-end">
+                <MenuItem onClick={() => signOut()}>Log Out</MenuItem>
+              </Stack>
+            </Box>
+          )}
+          {session && (
+            <Box>
+              <Tooltip title="User Settings">
+                <IconButton sx={{ p: 0 }}>
+                  <Link href={`/users/${session?.user?.id}`}>
+                    <Avatar alt="User Icon" src={session?.user?.image} />
+                  </Link>
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
+        </StyledToolbar>
+      </Container>
+    </AppBar>
   );
 };
 

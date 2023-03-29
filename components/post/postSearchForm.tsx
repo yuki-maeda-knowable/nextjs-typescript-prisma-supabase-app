@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import { Stack, TextField } from "@mui/material";
 
 interface SearchInput {
   title: string;
@@ -32,26 +33,16 @@ const PostSearchForm = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleSearch)}>
-        <input
+      <Stack component="form" onSubmit={handleSubmit(handleSearch)}>
+        <TextField
           {...register("title", { required: true })}
-          type="text"
+          id="standard-search"
+          label="Search field"
+          type="search"
+          variant="standard"
           placeholder="search"
         />
-        <button
-          className="bg-purple-100 bg-transparent hover:bg-purple-500 text-purple-900 font-semibold hover:text-white py-1 px-3 border border-purple-500 hover:border-transparent rounded-full"
-          type="submit"
-        >
-          Search
-        </button>
-      </form>
-      <button
-        onClick={handleSearchReset}
-        className="bg-purple-100 bg-transparent hover:bg-purple-500 text-purple-900 font-semibold hover:text-white py-1 px-3 border border-purple-500 hover:border-transparent rounded-full"
-        type="button"
-      >
-        リセット
-      </button>
+      </Stack>
     </>
   );
 };
