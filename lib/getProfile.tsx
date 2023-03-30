@@ -9,6 +9,6 @@ export default async function getProfile(id) {
       Photo: true,
     },
   });
-  const newProfile = { ...profile, birthday: String(profile.birthday) };
+  const newProfile = { ...profile, birthday: String(profile?.birthday) };
   return newProfile;
 }
