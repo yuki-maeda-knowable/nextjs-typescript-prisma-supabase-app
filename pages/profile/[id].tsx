@@ -18,6 +18,7 @@ import { Splide, SplideSlide } from "@splidejs/react-splide";
 import "@splidejs/react-splide/css";
 import { Options } from "@splidejs/splide";
 import Image from "next/image";
+import { useRouter } from "next/router";
 interface profile {
   nickname: string;
   photo: [];
@@ -29,7 +30,7 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: "/users/create",
+        destination: "/auth/signin",
         permanent: false,
       },
     };
@@ -43,17 +44,6 @@ export async function getServerSideProps(context) {
 }
 
 const Profile = (props) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<profile>({
-    defaultValues: {
-      nickname: "",
-      photo: [],
-    },
-  });
-
   const thumbsOptions: Options = {
     type: "loop",
     rewind: true,
@@ -77,10 +67,10 @@ const Profile = (props) => {
 
         <Stack component="form" alignItems="center">
           <Card sx={{ width: 300 }}>
-            <Splide aria-label="私のお気に入りの画像集" options={thumbsOptions}>
+            <Splide aria-label="profile" options={thumbsOptions}>
               {props.profile.Photo?.map((photo) => {
                 return (
-                  <SplideSlide>
+                  <SplideSlide key={photo.id}>
                     <Image
                       width={300}
                       height={300}
@@ -115,6 +105,12 @@ const Profile = (props) => {
             <CardActions>
               <Button size="small">Share</Button>
               <Button size="small">Learn More</Button>
+              <Button
+                href={`/profile/edit/${props?.profile?.userId}/`}
+                size="small"
+              >
+                Edit
+              </Button>
             </CardActions>
           </Card>
         </Stack>
