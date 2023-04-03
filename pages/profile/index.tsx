@@ -4,7 +4,7 @@ import ProfileForm from "../../components/profile/profileForm";
 const Profile = () => {
   return (
     <Layout>
-      <ProfileForm />
+      <ProfileForm profile />
     </Layout>
   );
 };
