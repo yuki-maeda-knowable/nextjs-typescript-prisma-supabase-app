@@ -2,16 +2,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import Layout from "../Layout";
-import {
-  Container,
-  Typography,
-  Stack,
-  Avatar,
-  IconButton,
-  TextField,
-  Button,
-} from "@mui/material";
-import { AddAPhoto } from "@mui/icons-material";
+import { Container, Typography, Stack, TextField, Button } from "@mui/material";
 
 interface UserInput {
   email: String;
@@ -19,7 +10,6 @@ interface UserInput {
 }
 
 export default function SignInForm() {
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -40,7 +30,7 @@ export default function SignInForm() {
       await signIn("credentials", {
         email: formData.email,
         password: formData.password,
-        callbackUrl: "/p/drafts",
+        callbackUrl: "/",
         redirect: true,
       });
     } catch (error) {

@@ -20,7 +20,6 @@ import useCurrentUser from "../hooks/useCurrentUser";
 
 const Header: React.FC = () => {
   const { data: currentUser } = useCurrentUser();
-  console.log(currentUser);
 
   const Search = styled(Box)({
     backgroundColor: "background.default",
@@ -80,8 +79,8 @@ const Header: React.FC = () => {
             <Box>
               <Tooltip title="User Settings">
                 <IconButton sx={{ p: 0 }}>
-                  <Link href={`/users/${currentUser?.user?.id}`}>
-                    <Avatar alt="User Icon" src={currentUser?.user?.image} />
+                  <Link href={`/users/${currentUser?.id}`}>
+                    <Avatar alt="User Icon" src={currentUser?.image} />
                   </Link>
                 </IconButton>
               </Tooltip>

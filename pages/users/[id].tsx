@@ -92,7 +92,6 @@ const User = (user: UserProps) => {
         body: JSON.stringify(formData),
       });
       const user = await res.json();
-      console.log(user);
 
       router.push(`/users/${id}`);
     } // uploadImageUrlがデフォルト画像じゃなかったら更新
@@ -162,7 +161,7 @@ const User = (user: UserProps) => {
           <Stack direction={"row"}>
             <Avatar
               sx={{ width: 80, height: 80 }}
-              src={uploadImageUrl ? uploadImageUrl : ""}
+              src={user.image ? user.image : uploadImageUrl}
             ></Avatar>
             <IconButton
               color="default"
