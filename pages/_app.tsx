@@ -2,6 +2,7 @@ import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import "tailwindcss/tailwind.css";
 import { ThemeProvider } from "@mui/material";
+import "/styles/globals.css";
 import theme from "../theme";
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   return (

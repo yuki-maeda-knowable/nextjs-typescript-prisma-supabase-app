@@ -8,7 +8,7 @@ type Props = {
 const Layout: React.FC<Props> = (props) => (
   <Container color={"text.default"} sx={{ bgcolor: "background.default" }}>
     <Header />
-    <Box>{props.children}</Box>
+    {props.children}
   </Container>
 );
 

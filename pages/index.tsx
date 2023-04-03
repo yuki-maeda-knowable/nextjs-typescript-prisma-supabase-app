@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!session) {
     return {
       redirect: {
-        destination: "/users/create",
+        destination: "/auth/signin",
         permanent: false,
       },
     };
@@ -85,53 +85,65 @@ const Blog = (props: Props) => {
 
   return (
     <Layout>
-      <Typography variant="h5" sx={{ color: "whitesmoke" }}>
-        Public Feed
-      </Typography>
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography color="whitesmoke" variant="h6" justifyContent="flex-end">
-          <Link href={`/profile/${currentUser?.id}`}>
-            <a>{props?.profile?.nickname}のプロフィール</a>
-          </Link>
-        </Typography>
+      <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{ color: "whitesmoke", display: "inline-block" }}
+          >
+            Public Feed
+          </Typography>
+        </Box>
+        <Box sx={{ display: "inline-block" }}>
+          <Typography color="whitesmoke" variant="h6">
+            <Link href={`/profile/${currentUser?.id}`}>
+              <a>
+                {props?.profile?.nickname
+                  ? props?.profile?.nickname
+                  : currentUser?.name}
+                のプロフィール
+              </a>
+            </Link>
+          </Typography>
+        </Box>
+        <Box sx={{ marginTop: "10px" }}>
+          <Typography color="whitesmoke" variant="h6">
+            {props.feed.length} Posts
+          </Typography>
+        </Box>
+        <Box>
+          {props.feed.map((post) => (
+            <Card key={post.id} sx={{ margin: 3 }}>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
+                    A
+                  </Avatar>
+                }
+                title={post.title}
+                subheader="September 14, 2016"
+              />
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  {post.content}
+                </Typography>
+              </CardContent>
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  <Checkbox
+                    checkedIcon={<Favorite sx={{ color: "red" }} />}
+                    icon={<FavoriteBorder />}
+                  />
+                </IconButton>
+                <IconButton aria-label="share">
+                  <Share />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+        <PostAdd />
       </Box>
-      <Box>
-        <Typography color="whitesmoke" variant="h6">
-          {props.feed.length} Posts
-        </Typography>
-      </Box>
-      <Box>
-        {props.feed.map((post) => (
-          <Card key={post.id} sx={{ margin: 3 }}>
-            <CardHeader
-              avatar={
-                <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
-                  A
-                </Avatar>
-              }
-              title={post.title}
-              subheader="September 14, 2016"
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {post.content}
-              </Typography>
-            </CardContent>
-            <CardActions disableSpacing>
-              <IconButton aria-label="add to favorites">
-                <Checkbox
-                  icon={<FavoriteBorder />}
-                  checkedIcon={<Favorite sx={{ color: "red" }} />}
-                />
-              </IconButton>
-              <IconButton aria-label="share">
-                <Share />
-              </IconButton>
-            </CardActions>
-          </Card>
-        ))}
-      </Box>
-      <PostAdd />
     </Layout>
   );
 };
