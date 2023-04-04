@@ -6,6 +6,10 @@ const theme = createTheme({
     mode: "dark",
     primary: orange,
     secondary: lime,
+    text: {
+      primary: "#FFFFFF",
+      // その他のテキスト色の設定
+    },
   },
 });
 

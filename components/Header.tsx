@@ -16,9 +16,10 @@ import {
 } from "@mui/material";
 import styled from "@emotion/styled";
 import PostSearchForm from "./post/postSearchForm";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 const Header: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { data: currentUser } = useCurrentUser();
 
   const Search = styled(Box)({
     backgroundColor: "background.default",
@@ -53,37 +54,25 @@ const Header: React.FC = () => {
           >
             LOGO
           </Typography>
-
-          <Search sx={{ display: { xs: "none", sm: "flex" } }}>
-            <PostSearchForm />
-          </Search>
-
-          <Button>
-            <Link href={`/profile/1`}>profile</Link>
-          </Button>
-          {!session && (
-            <Box sx={{ flexGrow: 1 }}>
-              <Stack direction={"row"} justifyContent="flex-end">
-                <MenuItem onClick={() => signIn()}>Log In</MenuItem>
-                <MenuItem>
-                  <Link href={`/users/create`}>Sign Up</Link>
-                </MenuItem>
-              </Stack>
-            </Box>
+          {currentUser && (
+            <Search sx={{ display: { xs: "none", sm: "flex" } }}>
+              <PostSearchForm />
+            </Search>
           )}
-          {session && (
+
+          {currentUser && (
             <Box sx={{ flexGrow: 1 }}>
               <Stack direction={"row"} justifyContent="flex-end">
                 <MenuItem onClick={() => signOut()}>Log Out</MenuItem>
               </Stack>
             </Box>
           )}
-          {session && (
+          {currentUser && (
             <Box>
               <Tooltip title="User Settings">
                 <IconButton sx={{ p: 0 }}>
-                  <Link href={`/users/${session?.user?.id}`}>
-                    <Avatar alt="User Icon" src={session?.user?.image} />
+                  <Link href={`/users/${currentUser?.id}`}>
+                    <Avatar alt="User Icon" src={currentUser?.image} />
                   </Link>
                 </IconButton>
               </Tooltip>

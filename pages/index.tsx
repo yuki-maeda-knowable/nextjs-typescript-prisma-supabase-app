@@ -3,7 +3,7 @@ import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
 import { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
-import { useSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
 import {
   Avatar,
@@ -16,15 +16,32 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { Favorite, FavoriteBorder, MoreVert, Share } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Share } from "@mui/icons-material";
+import getProfile from "../lib/getProfile";
+import Link from "next/link";
+import useCurrentUser from "../hooks/useCurrentUser";
 
 type Props = {
   feed: PostProps[];
   keyword: string;
   sample: string;
+  profile: any;
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  const profile = await getProfile(session?.user?.id);
+
   const { keyword } = context.query;
 
   // 検索ワードが配列になっちゃうから、一旦文字列に変換
@@ -43,14 +60,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     },
   });
   return {
-    props: { feed },
+    props: { feed, profile },
   };
 };
 
 const Blog = (props: Props) => {
   //postが作成されたら、状態を更新する必要があるため、feedを定義
   const [feed, setFeed] = useState<PostProps[]>(props.feed);
-  const { data: session } = useSession();
+
+  const { data: currentUser } = useCurrentUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,41 +85,65 @@ const Blog = (props: Props) => {
 
   return (
     <Layout>
-      <Typography variant="h5" sx={{ color: "whitesmoke" }}>
-        Public Feed
-      </Typography>
-      <Box>
-        {props.feed.map((post) => (
-          <Card key={post.id} sx={{ margin: 3 }}>
-            <CardHeader
-              avatar={
-                <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
-                  A
-                </Avatar>
-              }
-              title={post.title}
-              subheader="September 14, 2016"
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {post.content}
-              </Typography>
-            </CardContent>
-            <CardActions disableSpacing>
-              <IconButton aria-label="add to favorites">
-                <Checkbox
-                  icon={<FavoriteBorder />}
-                  checkedIcon={<Favorite sx={{ color: "red" }} />}
-                />
-              </IconButton>
-              <IconButton aria-label="share">
-                <Share />
-              </IconButton>
-            </CardActions>
-          </Card>
-        ))}
+      <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{ color: "whitesmoke", display: "inline-block" }}
+          >
+            Public Feed
+          </Typography>
+        </Box>
+        <Box sx={{ display: "inline-block" }}>
+          <Typography color="whitesmoke" variant="h6">
+            <Link href={`/profile/${currentUser?.id}`}>
+              <a>
+                {props?.profile?.nickname
+                  ? props?.profile?.nickname
+                  : currentUser?.name}
+                のプロフィール
+              </a>
+            </Link>
+          </Typography>
+        </Box>
+        <Box sx={{ marginTop: "10px" }}>
+          <Typography color="whitesmoke" variant="h6">
+            {props.feed.length} Posts
+          </Typography>
+        </Box>
+        <Box>
+          {props.feed.map((post) => (
+            <Card key={post.id} sx={{ margin: 3 }}>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
+                    A
+                  </Avatar>
+                }
+                title={post.title}
+                subheader="September 14, 2016"
+              />
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  {post.content}
+                </Typography>
+              </CardContent>
+              <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                  <Checkbox
+                    checkedIcon={<Favorite sx={{ color: "red" }} />}
+                    icon={<FavoriteBorder />}
+                  />
+                </IconButton>
+                <IconButton aria-label="share">
+                  <Share />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+        <PostAdd />
       </Box>
-      <PostAdd />
     </Layout>
   );
 };

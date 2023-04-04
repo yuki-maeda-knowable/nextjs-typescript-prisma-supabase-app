@@ -99,7 +99,7 @@ export default function UserForm() {
         await signIn("credentials", {
           email,
           password,
-          callbackUrl: "/",
+          callbackUrl: "/profile",
           redirect: true,
         });
       } catch (error) {

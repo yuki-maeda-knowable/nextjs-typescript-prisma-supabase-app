@@ -48,7 +48,7 @@ export default function PostForm() {
 
   return (
     <Layout>
-      <Container>
+      <Container sx={{ border: "solid 1 white" }}>
         <Typography
           variant="h6"
           color="gray"
