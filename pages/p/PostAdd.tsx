@@ -95,6 +95,7 @@ export default function PostAdd() {
           position: "fixed",
           bottom: 20,
           left: { xs: "calc(50% - 25px)", md: 30 },
+          color: "text.primary",
         }}
       >
         <Fab color="primary" aria-label="add">
@@ -116,6 +117,7 @@ export default function PostAdd() {
           borderRadius={5}
           p={2}
           color={"text.primary"}
+          sx={{ border: "solid 1px white" }}
         >
           <Typography variant="h6" color="gray" textAlign="center">
             Create Post

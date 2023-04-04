@@ -182,7 +182,7 @@ const ProfileForm = ({ profile }) => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container sx={{ bgcolor: "background.default", height: "100vh" }}>
       <Typography variant="h6" color="whitesmoke">
         {variant === "register" ? "profile作成" : "profile編集"}
       </Typography>

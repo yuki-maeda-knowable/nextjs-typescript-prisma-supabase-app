@@ -6,6 +6,8 @@ import { GetServerSidePropsContext } from "next";
 import { Profile } from "../../../components/profile/profileForm";
 import ProfileForm from "../../../components/profile/profileForm";
 import { useRouter } from "next/router";
+import { Box, Typography } from "@mui/material";
+import Layout from "../../../components/Layout";
 type EditProfile = {
   profile?: Profile;
 };
@@ -43,10 +45,18 @@ const EditProfile: React.FC<EditProfile> = (profile) => {
   }, []);
 
   return (
-    <div>
-      <h1>Edit Profile</h1>
-      <ProfileForm profile={user?.profile} />
-    </div>
+    <Layout>
+      <Box
+        sx={{
+          color: "text.primary",
+        }}
+      >
+        <Typography variant="h4" sx={{ padding: 2 }}>
+          Edit Profile
+        </Typography>
+        <ProfileForm profile={user?.profile} />
+      </Box>
+    </Layout>
   );
 };
 
