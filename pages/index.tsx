@@ -12,14 +12,15 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Checkbox,
   IconButton,
   Typography,
 } from "@mui/material";
-import { Favorite, FavoriteBorder, Share } from "@mui/icons-material";
+import { Share } from "@mui/icons-material";
 import getProfile from "../lib/getProfile";
 import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
+import FavoriteButton from "../components/FavoriteButton";
+import Loading from "./loading";
 
 type Props = {
   feed: PostProps[];
@@ -68,6 +69,8 @@ const Blog = (props: Props) => {
   //postが作成されたら、状態を更新する必要があるため、feedを定義
   const [feed, setFeed] = useState<PostProps[]>(props.feed);
 
+  //loading中の状態を管理するためのstate
+  const [isLoading, setIsLoading] = useState(true);
   const { data: currentUser } = useCurrentUser();
 
   useEffect(() => {
@@ -75,6 +78,7 @@ const Blog = (props: Props) => {
       try {
         const res = await fetch(`/api/post`);
         const newFeed = await res.json();
+        setIsLoading(false);
         setFeed(newFeed);
       } catch (error) {
         console.error(error);
@@ -82,6 +86,11 @@ const Blog = (props: Props) => {
     };
     fetchData();
   }, [props.feed]);
+
+  //loading画面の表示
+  if (isLoading) {
+    return <Loading open={isLoading} />;
+  }
 
   return (
     <Layout>
@@ -129,12 +138,8 @@ const Blog = (props: Props) => {
                 </Typography>
               </CardContent>
               <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                  <Checkbox
-                    checkedIcon={<Favorite sx={{ color: "red" }} />}
-                    icon={<FavoriteBorder />}
-                  />
-                </IconButton>
+                <FavoriteButton postId={post.id} />
+
                 <IconButton aria-label="share">
                   <Share />
                 </IconButton>

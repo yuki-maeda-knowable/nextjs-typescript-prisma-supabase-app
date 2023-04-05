@@ -4,6 +4,7 @@ import User, { UserProps } from "../../components/user/User";
 import prisma from "../../lib/prisma";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Loading from "../loading";
 
 //ユーザ一覧の型定義
 type Props = {
@@ -21,20 +22,26 @@ export const getStaticProps: GetStaticProps = async () => {
 
 const Users = (props: Props) => {
   const [users, setUsers] = useState<UserProps[]>(props.users);
+  //loading画面の表示
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch(`/api/user`);
         const newUser = await res.json();
+        setIsLoading(false);
         setUsers(newUser);
-        console.log(newUser);
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
   }, [props.users]);
+
+  if (isLoading) {
+    return <Loading open={isLoading} />;
+  }
 
   return (
     <Layout>
