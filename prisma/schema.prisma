@@ -2,7 +2,6 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-
 }
 
 generator client {
@@ -10,42 +9,46 @@ generator client {
 }
 
 model Post {
-  id        String     @default(cuid()) @id
+  id        String      @id @default(cuid())
   title     String
   content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
+  published Boolean     @default(false)
+  author    User?       @relation(fields: [authorId], references: [id])
   authorId  String?
+  favorites Favorites[]
 }
 
 model User {
-  id            String       @default(cuid()) @id
+  id            String      @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?     @unique
   emailVerified DateTime?
   image         String?
   password      String
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  createdAt     DateTime    @default(now()) @map(name: "created_at")
+  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
   profile       Profile?
+  favorites     Favorites[]
+
   @@map(name: "users")
 }
+
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -69,18 +72,29 @@ model VerificationToken {
 }
 
 model Profile {
-  id String @default(cuid()) @id
+  id       String   @id @default(cuid())
   nickname String
-  gender Int //1: 女 2:男 3:その他
+  gender   Int //1: 女 2:男 3:その他
   birthday DateTime
-  Photo Photo[]
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  Photo    Photo[]
+  User     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String   @unique
 }
 
-model Photo{
-  id String @id @default(cuid())
-  Profie Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+model Photo {
+  id        String  @id @default(cuid())
+  Profie    Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId String
-  url String?
+  url       String?
+}
+
+model Favorites {
+  id     String @id @default(cuid())
+  userId String
+  User   User   @relation(fields: [userId], references: [id])
+  Post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  //UserモデルとPostモデルへの接続を定義
+  @@unique([userId, postId])
 }
