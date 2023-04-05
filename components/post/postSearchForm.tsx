@@ -9,7 +9,6 @@ const PostSearchForm = () => {
   const router = useRouter();
   const {
     register,
-    resetField,
     handleSubmit,
     formState: { errors },
   } = useForm<SearchInput>({
@@ -24,11 +23,6 @@ const PostSearchForm = () => {
       pathname: "/",
       query: { keyword: title },
     });
-  };
-
-  const handleSearchReset = () => {
-    resetField("title");
-    router.push("/");
   };
 
   return (

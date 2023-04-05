@@ -19,7 +19,8 @@ import {
   Box,
 } from "@mui/material";
 import { AddAPhoto } from "@mui/icons-material";
-import { useSession, getSession } from "next-auth/react";
+import { getSession } from "next-auth/react";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
 interface UserInput {
   id: string;
@@ -41,9 +42,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const { id } = context.query;
+
   const data = await prisma.user.findUnique({
     where: {
-      id: String(session?.user?.id),
+      id: String(id),
     },
   });
   const user = await JSON.parse(JSON.stringify(data));
@@ -53,6 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const User = (user: UserProps, { UserInput }) => {
+  const { data: currentUser } = useCurrentUser();
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState("");
@@ -208,18 +212,20 @@ const User = (user: UserProps, { UserInput }) => {
             >
               <Link href={`/`}>Home</Link>
             </Button>
-            <Button
-              variant="contained"
-              sx={{
-                color: "whitesmoke",
-                bgcolor: "background.default",
-                ":hover": { bgcolor: "gray" },
-                m: 2,
-              }}
-              type="submit"
-            >
-              update
-            </Button>
+            {currentUser?.id === user?.id && (
+              <Button
+                variant="contained"
+                sx={{
+                  color: "whitesmoke",
+                  bgcolor: "background.default",
+                  ":hover": { bgcolor: "gray" },
+                  m: 2,
+                }}
+                type="submit"
+              >
+                update
+              </Button>
+            )}
           </Box>
         </Stack>
       </Container>

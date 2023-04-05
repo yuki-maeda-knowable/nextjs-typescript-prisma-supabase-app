@@ -11,10 +11,11 @@ import {
 import React, { useState } from "react";
 import { Add as AddIcon } from "@mui/icons-material";
 import styled from "@emotion/styled";
-import { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import usePost from "../../hooks/usePost";
+import { useCallback } from "react";
 
 interface PostInput {
   title: string;
@@ -63,28 +64,37 @@ export default function PostAdd() {
     },
   });
 
-  const submitPostRegister = async (input: PostInput) => {
-    const { title, content, published } = input;
-    const postData = {
-      title: title,
-      content: content,
-      published: published,
-    };
+  // postsの一覧を取得しておく
+  const { data: posts, mutate: mutatePosts } = usePost();
 
-    try {
-      const res = await fetch(`/api/post`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "Application/json",
-        },
-        body: JSON.stringify(postData),
-      });
-      const data = await res.json();
-      router.push("/p/drafts");
-    } catch (error) {
-      console.error("Error registration Post: ", error);
-    }
-  };
+  const submitPostRegister = useCallback(
+    async (input: PostInput) => {
+      const { title, content, published } = input;
+      const postData = {
+        title: title,
+        content: content,
+        published: published,
+      };
+
+      try {
+        const res = await fetch(`/api/post`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "Application/json",
+          },
+          body: JSON.stringify(postData),
+        });
+        const data = await res.json();
+        //postが追加されたら、キャッシュを更新する
+        mutatePosts([...posts, data]);
+
+        router.push("/p/drafts");
+      } catch (error) {
+        console.error("Error registration Post: ", error);
+      }
+    },
+    [mutatePosts, posts]
+  );
 
   return (
     <>

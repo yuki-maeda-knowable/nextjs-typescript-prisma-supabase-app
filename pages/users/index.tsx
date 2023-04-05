@@ -22,26 +22,6 @@ export const getStaticProps: GetStaticProps = async () => {
 
 const Users = (props: Props) => {
   const [users, setUsers] = useState<UserProps[]>(props.users);
-  //loading画面の表示
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`/api/user`);
-        const newUser = await res.json();
-        setIsLoading(false);
-        setUsers(newUser);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-  }, [props.users]);
-
-  if (isLoading) {
-    return <Loading open={isLoading} />;
-  }
 
   return (
     <Layout>
@@ -51,7 +31,7 @@ const Users = (props: Props) => {
             <Link href={`/`}>Home</Link>
           </button>
           <button className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded">
-            <Link href={`/users/create`}>add User</Link>
+            <Link href={`/auth/signin`}>add User</Link>
           </button>
         </div>
         <h1>User一覧</h1>
