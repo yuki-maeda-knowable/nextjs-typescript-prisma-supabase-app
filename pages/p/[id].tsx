@@ -4,12 +4,39 @@ import ReactMarkdown from "react-markdown";
 import Layout from "../../components/Layout";
 import { PostProps } from "../../components/Post";
 import prisma from "../../lib/prisma";
-import { useRouter } from "next/router";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Typography,
+  IconButton,
+  Button,
+} from "@mui/material";
+import { Share } from "@mui/icons-material";
+import FavoriteButton from "../../components/FavoriteButton";
+import useCurrentUser from "../../hooks/useCurrentUser";
+import { getSession } from "next-auth/react";
+import useUser from "../../hooks/useUser";
+import Comments from "../../components/Comments";
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  //ログインしていなかったらリダイレクト
+  const user = await getSession(context);
+  if (!user) {
+    return {
+      redirect: {
+        destination: "/auth/signin",
+        permanent: false,
+      },
+    };
+  }
+
   const post = await prisma.post.findUnique({
     where: {
-      id: String(params?.id),
+      id: String(context?.params?.id),
     },
     include: {
       author: {
@@ -22,39 +49,41 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   };
 };
 
-const Post: React.FC<PostProps> = (props) => {
-  const router = useRouter();
-  async function handlePublish(id: string): Promise<void> {
-    const res = await fetch(`/api/post/${id}`, {
-      method: "PUT",
-    });
-    console.log(res);
-
-    router.push("/");
-  }
-
-  let title = props.title;
-  if (!props.published) {
-    title = `${title} (Draft)`;
-  }
+const Post: React.FC<PostProps> = (post) => {
+  const { data: user } = useCurrentUser();
+  const { data: author } = useUser(post.authorId);
 
   return (
     <Layout>
-      <div>
-        <h2>{title}</h2>
-        <p>By {props?.author?.name || "Unknown author"}</p>
-        <ReactMarkdown children={props.content} />
-        {console.log(props.author.email)}
-        {!props.published && (
-          <button
-            onClick={() => handlePublish(props.id)}
-            type="button"
-            className="w-10 text-white bg-blue-700 hover:bg-blue-800 focus:ring-2  font-small rounded-lg text-sm px-1 py-1 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-          >
-            公開
-          </button>
-        )}
-      </div>
+      <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
+        <Card key={post.id} sx={{ margin: 3 }}>
+          <CardHeader
+            avatar={
+              <Avatar
+                sx={{ bgcolor: "red" }}
+                aria-label="recipe"
+                src={author?.image}
+              />
+            }
+            title={post.title}
+            subheader="September 14, 2016"
+          />
+          {post?.author?.name || "Unknown author"}
+          <CardContent>
+            <Typography variant="body2" color="text.secondary">
+              {post.content}
+            </Typography>
+          </CardContent>
+          <CardActions disableSpacing>
+            <FavoriteButton postId={post.id} />
+            <IconButton aria-label="share">
+              <Share />
+            </IconButton>
+            {post.authorId === user?.id && <Button>編集</Button>}
+          </CardActions>
+        </Card>
+        <Comments />
+      </Box>
     </Layout>
   );
 };

@@ -105,6 +105,43 @@ const Blog = (props: Props) => {
         <Box>
           {props?.feed?.length === 0 &&
             posts?.map((post) => (
+              <Link href={`/p/${post.id}`}>
+                <Card
+                  key={post.id}
+                  sx={{
+                    margin: 3,
+                    cursor: "pointer",
+                  }}
+                >
+                  <CardHeader
+                    avatar={
+                      <Avatar
+                        sx={{ bgcolor: "red" }}
+                        aria-label="recipe"
+                      ></Avatar>
+                    }
+                    title={post.title}
+                    subheader="September 14, 2016"
+                  />
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      {post.content}
+                    </Typography>
+                  </CardContent>
+                  <CardActions disableSpacing>
+                    <FavoriteButton postId={post.id} />
+
+                    <IconButton aria-label="share">
+                      <Share />
+                    </IconButton>
+                  </CardActions>
+                </Card>
+              </Link>
+            ))}
+          {/* 検索した結果があればこちらを表示 */}
+          {props?.feed?.map((post) => (
+            <Link href={`/p/${post.id}`}>
+              {post.id}
               <Card key={post.id} sx={{ margin: 3 }}>
                 <CardHeader
                   avatar={
@@ -128,32 +165,7 @@ const Blog = (props: Props) => {
                   </IconButton>
                 </CardActions>
               </Card>
-            ))}
-          {/* 検索した結果があればこちらを表示 */}
-          {props?.feed?.map((post) => (
-            <Card key={post.id} sx={{ margin: 3 }}>
-              <CardHeader
-                avatar={
-                  <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
-                    A
-                  </Avatar>
-                }
-                title={post.title}
-                subheader="September 14, 2016"
-              />
-              <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                  {post.content}
-                </Typography>
-              </CardContent>
-              <CardActions disableSpacing>
-                <FavoriteButton postId={post.id} />
-
-                <IconButton aria-label="share">
-                  <Share />
-                </IconButton>
-              </CardActions>
-            </Card>
+            </Link>
           ))}
         </Box>
         <PostAdd />
