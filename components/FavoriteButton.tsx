@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
-import { Checkbox, IconButton } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { Checkbox, IconButton, Typography } from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useCallback } from "react";
 import useFavorite from "../hooks/useFavorite";
+import useFavoriteCount from "../hooks/useFavoriteCount";
 
 //親から渡されるpropsの型を定義
 interface FavoriteButtonProps {
@@ -12,6 +13,10 @@ interface FavoriteButtonProps {
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
   //useFavoriteを利用して、キャッシュを保持する
   const { mutate: mutateFavorites, data: favoriteData = [] } = useFavorite();
+  const { mutate: mutateFavoriteCount, data: favoriteCount = [] } =
+    useFavoriteCount(postId);
+
+  // const [favoriteCount, setFavoriteCount] = useState(favoriteCountData);
 
   const isFavorite = useMemo(() => {
     const list = favoriteData.map((item) => item.postId);
@@ -39,6 +44,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
     mutateFavorites([...favoriteData, data]);
   }, [isFavorite, postId, mutateFavorites]);
 
+  //いいねの数も更新する
+  mutateFavoriteCount();
+
   return (
     <IconButton onClick={toggleFavorite} aria-label="add to favorites">
       <Checkbox
@@ -46,6 +54,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
         checkedIcon={<Favorite sx={{ color: "red" }} />}
         icon={<FavoriteBorder />}
       />
+      <Typography
+        variant="body1"
+        fontSize={"0.7rem"}
+        sx={{ position: "absolute", right: "9px" }}
+      >
+        {favoriteCount}
+      </Typography>
     </IconButton>
   );
 };
