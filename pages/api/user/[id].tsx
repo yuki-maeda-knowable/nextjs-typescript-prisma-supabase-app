@@ -38,4 +38,15 @@ export default async function handler(
     });
     return res.status(200).json(user);
   }
+
+  // GET /api/user/:id
+  if (req.method === "GET") {
+    const { id } = req.query;
+    const user = await prisma.user.findUnique({
+      where: {
+        id: String(id),
+      },
+    });
+    return res.status(200).json(user);
+  }
 }
