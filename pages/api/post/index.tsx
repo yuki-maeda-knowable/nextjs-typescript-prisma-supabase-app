@@ -34,7 +34,7 @@ export default async function handler(
       },
       include: {
         author: {
-          select: { name: true },
+          select: { name: true, image: true },
         },
       },
     });

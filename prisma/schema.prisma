@@ -93,8 +93,8 @@ model Photo {
 model Favorites {
   id     String @id @default(cuid())
   userId String
-  User   User   @relation(fields: [userId], references: [id])
-  Post   Post   @relation(fields: [postId], references: [id])
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
 
   //UserモデルとPostモデルへの接続を定義

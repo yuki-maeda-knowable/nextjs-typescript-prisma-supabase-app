@@ -54,11 +54,11 @@ const Header: React.FC = () => {
           >
             LOGO
           </Typography>
-          {currentUser && (
+          {/* {currentUser && (
             <Search sx={{ display: { xs: "none", sm: "flex" } }}>
               <PostSearchForm />
             </Search>
-          )}
+          )} */}
 
           {currentUser && (
             <Box sx={{ flexGrow: 1 }}>

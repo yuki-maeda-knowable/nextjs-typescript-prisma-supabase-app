@@ -17,5 +17,14 @@ export default async function handler(
       },
     });
     return res.status(200).json(data);
+  } else if (req.method === "DELETE") {
+    const { id } = req.query;
+
+    const data = await prisma.post.delete({
+      where: {
+        id: String(id),
+      },
+    });
+    return res.status(200).json(data);
   }
 }

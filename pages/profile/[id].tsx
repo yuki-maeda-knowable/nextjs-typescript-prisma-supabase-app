@@ -66,7 +66,7 @@ const Profile = (props) => {
         </Typography>
 
         <Stack component="form" alignItems="center">
-          <Card sx={{ width: 300 }}>
+          <Card sx={{ width: 300, p: 3 }}>
             <Splide aria-label="profile" options={thumbsOptions}>
               {props.profile.Photo?.map((photo) => {
                 return (
@@ -105,12 +105,12 @@ const Profile = (props) => {
             <CardActions>
               <Button size="small">Share</Button>
               <Button size="small">Learn More</Button>
-              <Button
+              {/* <Button
                 href={`/profile/edit/${props?.profile?.userId}/`}
                 size="small"
               >
                 Edit
-              </Button>
+              </Button> */}
             </CardActions>
           </Card>
         </Stack>
