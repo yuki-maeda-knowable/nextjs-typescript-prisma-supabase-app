@@ -56,8 +56,6 @@ const Drafts = (props: Drafts) => {
     const res = await fetch(`/api/post/${id}`, {
       method: "PUT",
     });
-    console.log(res);
-
     router.push("/");
   }
   if (!session) {
