@@ -7,6 +7,7 @@ interface UserInput {
   type?: string;
   onChange?: any;
   placeholder?: string;
+  rows?: number;
 }
 
 const UserInputForm: React.FC<UserInput> = ({
@@ -16,6 +17,7 @@ const UserInputForm: React.FC<UserInput> = ({
   type,
   onChange,
   placeholder,
+  rows,
 }) => {
   return (
     <>
@@ -27,6 +29,8 @@ const UserInputForm: React.FC<UserInput> = ({
         onChange={onChange}
         value={value}
         id={id}
+        multiline={rows ? true : false}
+        rows={rows}
         required
       />
     </>
