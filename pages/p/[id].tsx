@@ -55,6 +55,7 @@ const Post: React.FC<PostProps> = (post) => {
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
+        <Button href={"/"}>一覧へ戻る</Button>
         <Card key={post.id} sx={{ margin: 3 }}>
           <CardHeader
             avatar={
@@ -65,7 +66,6 @@ const Post: React.FC<PostProps> = (post) => {
               />
             }
             title={post.title}
-            subheader="September 14, 2016"
           />
           {post?.author?.name || "Unknown author"}
           <CardContent>

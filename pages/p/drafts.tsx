@@ -83,19 +83,25 @@ const Drafts = (props: Drafts) => {
         My Drafts
       </Typography>
       <Box>
+        <Button href={"/"}>一覧へ戻る</Button>
         {props.drafts.map((post) => (
           <Card key={post.id} sx={{ margin: 3 }}>
             <CardHeader
               avatar={
-                <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
-                  A
-                </Avatar>
+                <Avatar
+                  sx={{ bgcolor: "red" }}
+                  aria-label="recipe"
+                  src={session?.user?.image}
+                ></Avatar>
               }
               title={post.title}
-              subheader="September 14, 2016"
             />
             <CardContent>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                whiteSpace={"pre-line"}
+              >
                 {post.content}
               </Typography>
             </CardContent>

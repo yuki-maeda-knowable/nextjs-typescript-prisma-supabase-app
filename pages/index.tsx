@@ -20,6 +20,8 @@ import getProfile from "../lib/getProfile";
 import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
+import usePost from "../hooks/usePost";
+import { Button } from "@mui/material";
 
 type Props = {
   feed: PostProps[];
@@ -81,6 +83,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Blog = (props: Props) => {
   const { data: currentUser } = useCurrentUser();
 
+  const { data: posts, mutate: mutatePosts, error } = usePost();
+
+  const handleDeletePost = async (id: string) => {
+    //apiを叩いて削除
+    const res = await fetch(`/api/post/${id}`, {
+      method: "DELETE",
+    });
+    await res.json();
+    mutatePosts();
+  };
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
@@ -106,11 +118,11 @@ const Blog = (props: Props) => {
         </Box>
         <Box sx={{ marginTop: "10px" }}>
           <Typography color="whitesmoke" variant="h6">
-            {props?.feed?.length ? props?.feed?.length : 0} Posts
+            {posts?.length ? posts?.length : 0} Posts
           </Typography>
         </Box>
         <Box>
-          {props?.feed?.map((post) => (
+          {posts?.map((post) => (
             <Card
               key={post.id}
               sx={{ margin: 3, ":hover": { opacity: "0.8" } }}
@@ -141,6 +153,16 @@ const Blog = (props: Props) => {
                 <IconButton aria-label="share">
                   <Share />
                 </IconButton>
+                {/* 投稿者とログインユーザが同じなら表示 */}
+                {currentUser?.id === post?.authorId && (
+                  <Button
+                    onClick={() => {
+                      handleDeletePost(post.id);
+                    }}
+                  >
+                    削除
+                  </Button>
+                )}
               </CardActions>
             </Card>
           ))}
