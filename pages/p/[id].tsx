@@ -82,7 +82,9 @@ const Post: React.FC<PostProps> = (post) => {
             <IconButton aria-label="share">
               <Share />
             </IconButton>
-            {post.authorId === user?.id && <Button>編集</Button>}
+            {post.authorId === user?.id && (
+              <Button href={`/p/edit/${post.id}`}>編集</Button>
+            )}
           </CardActions>
         </Card>
         <Comments postId={post.id} />
