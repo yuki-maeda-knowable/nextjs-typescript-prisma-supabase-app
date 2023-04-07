@@ -1,6 +1,5 @@
 import React from "react";
 import { GetServerSideProps } from "next";
-import ReactMarkdown from "react-markdown";
 import Layout from "../../components/Layout";
 import { PostProps } from "../../components/Post";
 import prisma from "../../lib/prisma";
@@ -70,7 +69,11 @@ const Post: React.FC<PostProps> = (post) => {
           />
           {post?.author?.name || "Unknown author"}
           <CardContent>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              whiteSpace={"pre-line"}
+            >
               {post.content}
             </Typography>
           </CardContent>
@@ -82,7 +85,7 @@ const Post: React.FC<PostProps> = (post) => {
             {post.authorId === user?.id && <Button>編集</Button>}
           </CardActions>
         </Card>
-        <Comments />
+        <Comments postId={post.id} />
       </Box>
     </Layout>
   );

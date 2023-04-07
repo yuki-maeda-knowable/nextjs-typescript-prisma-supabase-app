@@ -8,6 +8,7 @@ export type PostProps = {
   author: {
     name: string;
     email: string;
+    image: string;
   } | null;
   authorId?: string;
   content: string;

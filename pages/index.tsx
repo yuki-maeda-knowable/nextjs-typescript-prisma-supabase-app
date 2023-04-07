@@ -20,7 +20,6 @@ import getProfile from "../lib/getProfile";
 import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
-import usePost from "../hooks/usePost";
 
 type Props = {
   feed: PostProps[];
@@ -55,7 +54,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
       include: {
         author: {
-          select: { name: true },
+          select: { name: true, image: true },
         },
       },
     });
@@ -63,16 +62,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: { feed, profile },
     };
   } else {
+    const feed = await prisma.post.findMany({
+      where: {
+        published: true,
+      },
+      include: {
+        author: {
+          select: { name: true, image: true },
+        },
+      },
+    });
     return {
-      props: { feed: [], profile },
+      props: { feed, profile },
     };
   }
 };
 
 const Blog = (props: Props) => {
   const { data: currentUser } = useCurrentUser();
-  // postの一覧を取得
-  const { data: posts } = usePost();
 
   return (
     <Layout>
@@ -99,73 +106,43 @@ const Blog = (props: Props) => {
         </Box>
         <Box sx={{ marginTop: "10px" }}>
           <Typography color="whitesmoke" variant="h6">
-            {props?.feed?.length ? props?.feed?.length : posts?.length} Posts
+            {props?.feed?.length ? props?.feed?.length : 0} Posts
           </Typography>
         </Box>
         <Box>
-          {props?.feed?.length === 0 &&
-            posts?.map((post) => (
-              <Link href={`/p/${post.id}`}>
-                <Card
-                  key={post.id}
-                  sx={{
-                    margin: 3,
-                    cursor: "pointer",
-                  }}
-                >
-                  <CardHeader
-                    avatar={
-                      <Avatar
-                        sx={{ bgcolor: "red" }}
-                        aria-label="recipe"
-                      ></Avatar>
-                    }
-                    title={post.title}
-                    subheader="September 14, 2016"
-                  />
-                  <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                      {post.content}
-                    </Typography>
-                  </CardContent>
-                  <CardActions disableSpacing>
-                    <FavoriteButton postId={post.id} />
-
-                    <IconButton aria-label="share">
-                      <Share />
-                    </IconButton>
-                  </CardActions>
-                </Card>
-              </Link>
-            ))}
-          {/* 検索した結果があればこちらを表示 */}
           {props?.feed?.map((post) => (
-            <Link href={`/p/${post.id}`}>
-              {post.id}
-              <Card key={post.id} sx={{ margin: 3 }}>
-                <CardHeader
-                  avatar={
-                    <Avatar sx={{ bgcolor: "red" }} aria-label="recipe">
-                      A
-                    </Avatar>
-                  }
-                  title={post.title}
-                  subheader="September 14, 2016"
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
+            <Card
+              key={post.id}
+              sx={{ margin: 3, ":hover": { opacity: "0.8" } }}
+            >
+              <CardHeader
+                avatar={
+                  <Avatar
+                    sx={{ bgcolor: "white" }}
+                    aria-label="recipe"
+                    src={post?.author?.image}
+                  ></Avatar>
+                }
+                title={post.title}
+              />
+              <Link href={`/p/${post.id}`}>
+                <CardContent sx={{ cursor: "pointer" }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    whiteSpace={"pre-wrap"}
+                  >
                     {post.content}
                   </Typography>
                 </CardContent>
-                <CardActions disableSpacing>
-                  <FavoriteButton postId={post.id} />
-
-                  <IconButton aria-label="share">
-                    <Share />
-                  </IconButton>
-                </CardActions>
-              </Card>
-            </Link>
+              </Link>
+              <CardActions disableSpacing>
+                <FavoriteButton postId={post.id} />
+                <IconButton aria-label="share">
+                  <Share />
+                </IconButton>
+              </CardActions>
+            </Card>
           ))}
         </Box>
         <PostAdd />

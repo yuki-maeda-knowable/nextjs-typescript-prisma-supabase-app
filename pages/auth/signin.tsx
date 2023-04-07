@@ -54,7 +54,14 @@ const Signin: NextPage = () => {
 
   return (
     <Layout>
-      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 20 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: 20,
+          color: "text.primary",
+        }}
+      >
         <Box
           sx={{ display: "flex", border: "1px solid black" }}
           justifyContent={"center"}
@@ -108,7 +115,7 @@ const Signin: NextPage = () => {
             >
               <Button
                 variant="contained"
-                sx={{ ":hover": { opacity: "0.8" } }}
+                sx={{ ":hover": { opacity: "0.8" }, color: "text.primary" }}
                 type="submit"
               >
                 {variant === "register" ? "register" : "Login"}
