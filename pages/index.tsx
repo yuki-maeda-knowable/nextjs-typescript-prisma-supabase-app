@@ -22,6 +22,7 @@ import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { Button } from "@mui/material";
+import { useEffect } from "react";
 
 type Props = {
   feed: PostProps[];
@@ -64,7 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: { feed, profile },
     };
   } else {
-    const feed = await prisma.post.findMany({
+    const data = await prisma.post.findMany({
       where: {
         published: true,
       },
@@ -74,6 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
       },
     });
+    const feed = JSON.parse(JSON.stringify(data));
     return {
       props: { feed, profile },
     };
@@ -93,6 +95,11 @@ const Blog = (props: Props) => {
     await res.json();
     mutatePosts();
   };
+
+  useEffect(() => {
+    mutatePosts();
+  }, [posts]);
+
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
