@@ -4,12 +4,22 @@ import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
 import useComments from "../hooks/useComments";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 const Comments = ({ postId }) => {
+  const router = useRouter();
   //ログインしている人しかコメントできないようにする
   const { data: user } = useCurrentUser();
   //コメントを取得
-  const { data: comments } = useComments(postId);
+  const { data: comments, mutate: mutateComment } = useComments(postId);
+
+  const handleCommentDelete = async (commentId) => {
+    const res = await fetch(`/api/comment/${commentId}`, {
+      method: "DELETE",
+    });
+    router.push(`/p/${postId}`);
+    mutateComment();
+  };
 
   return (
     <Box sx={{ color: "text.primary" }}>
@@ -40,7 +50,17 @@ const Comments = ({ postId }) => {
             </Stack>
             <Typography variant="body2" sx={{ mt: 3, mb: 2 }}>
               {comment.content}
-            </Typography>
+            </Typography>{" "}
+            {comment.User.id === user.id && (
+              <Link href={`/comments/${postId}/edit/${comment.id}`}>
+                <Button>編集</Button>
+              </Link>
+            )}
+            {comment.User.id === user.id && (
+              <Button onClick={() => handleCommentDelete(comment.id)}>
+                削除
+              </Button>
+            )}
           </Box>
         ))}
       </Box>
