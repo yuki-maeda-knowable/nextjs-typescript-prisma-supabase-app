@@ -23,6 +23,7 @@ import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { Button } from "@mui/material";
 import { useEffect } from "react";
+import getFavorite from "../lib/getFavorite";
 
 type Props = {
   feed: PostProps[];
@@ -43,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const profile = await getProfile(session?.user?.id);
-
+  const favorite = await getFavorite();
   const { keyword } = context.query;
   if (keyword) {
     // 検索ワードが配列になっちゃうから、一旦文字列に変換
@@ -99,7 +100,13 @@ const Blog = (props: Props) => {
   useEffect(() => {
     mutatePosts();
   }, [posts]);
-
+  if (!posts) {
+    return (
+      <div>
+        <h1>Loading...</h1>
+      </div>
+    );
+  }
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
