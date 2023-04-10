@@ -42,10 +42,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
     //いいねしたリストのキャッシュを更新する
     //最初に取得したリストを、いいねした/いいね削除したリストを更新する
     mutateFavorites([...favoriteData, data]);
+    //いいねの数も更新する
+    mutateFavoriteCount();
   }, [isFavorite, postId, mutateFavorites]);
-
-  //いいねの数も更新する
-  mutateFavoriteCount();
 
   return (
     <IconButton onClick={toggleFavorite} aria-label="add to favorites">
