@@ -13,16 +13,14 @@ interface FavoriteButtonProps {
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
   //useFavoriteを利用して、キャッシュを保持する
   const { mutate: mutateFavorites, data: favoriteData = [] } = useFavorite();
-  const { mutate: mutateFavoriteCount, data: favoriteCount = [] } =
+  const { mutate: mutateFavoriteCount, data: favoriteCount = 0 } =
     useFavoriteCount(postId);
-
-  // const [favoriteCount, setFavoriteCount] = useState(favoriteCountData);
 
   const isFavorite = useMemo(() => {
     const list = favoriteData.map((item) => item.postId);
     //listにpostIdが含まれているかをtrue, falseで返す
     return list.includes(postId);
-  }, [favoriteData, postId]);
+  }, [favoriteData]);
 
   const toggleFavorite = useCallback(async () => {
     //いいねの登録/削除を行う
@@ -41,7 +39,8 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
 
     //いいねしたリストのキャッシュを更新する
     //最初に取得したリストを、いいねした/いいね削除したリストを更新する
-    mutateFavorites([...favoriteData, data]);
+    // mutateFavorites([...favoriteData, data]);
+    mutateFavorites();
     //いいねの数も更新する
     mutateFavoriteCount();
   }, [isFavorite, postId, mutateFavorites]);
