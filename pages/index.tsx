@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
 import { PostProps } from "../components/Post";
@@ -7,13 +7,15 @@ import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
 import {
   Avatar,
-  Box,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   IconButton,
   Typography,
+  Box,
+  Button,
+  Pagination,
 } from "@mui/material";
 import { Share } from "@mui/icons-material";
 import getProfile from "../lib/getProfile";
@@ -21,9 +23,8 @@ import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
-import { Button } from "@mui/material";
 import { useEffect } from "react";
-import getFavorite from "../lib/getFavorite";
+import ReactPaginate from "react-paginate";
 
 type Props = {
   feed: PostProps[];
@@ -44,7 +45,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const profile = await getProfile(session?.user?.id);
-  const favorite = await getFavorite();
   const { keyword } = context.query;
   if (keyword) {
     // 検索ワードが配列になっちゃうから、一旦文字列に変換
@@ -88,6 +88,31 @@ const Blog = (props: Props) => {
 
   const { data: posts, mutate: mutatePosts, error } = usePost();
 
+  // ----------------
+  // 1ページに表示する記事数
+  const itemsPerPage = 5;
+  //1ページ目に表示させる最初の添字
+  const [itemsOffset, setItemsOffset] = useState(0);
+  //1ページ目の最後に表示させる添字
+  const endOffset = itemsOffset + itemsPerPage;
+  //現在のページに表示させる要素数
+  const currentPosts = posts?.slice(itemsOffset, endOffset);
+  //ページの数。postsの全体数を1ページあたりに表示する数でmath.ceilを使って切り上げる
+  const pageCount = Math.ceil(posts?.length / itemsPerPage);
+
+  //現在のページを管理するstate
+  const [currentPage, setCurrentPage] = useState(1);
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    pageIndex: number
+  ) => {
+    setCurrentPage(pageIndex);
+    console.log(pageIndex);
+    const selectedPage = pageIndex - 1;
+    const newOffset = (selectedPage * itemsPerPage) % posts?.length;
+    setItemsOffset(newOffset);
+  };
+
   const handleDeletePost = async (id: string) => {
     //apiを叩いて削除
     const res = await fetch(`/api/post/${id}`, {
@@ -100,6 +125,7 @@ const Blog = (props: Props) => {
   useEffect(() => {
     mutatePosts();
   }, [posts]);
+
   if (!posts) {
     return (
       <div>
@@ -107,6 +133,7 @@ const Blog = (props: Props) => {
       </div>
     );
   }
+
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
@@ -136,7 +163,7 @@ const Blog = (props: Props) => {
           </Typography>
         </Box>
         <Box>
-          {posts?.map((post) => (
+          {currentPosts?.map((post) => (
             <Card
               key={post.id}
               sx={{ margin: 3, ":hover": { opacity: "0.8" } }}
@@ -180,11 +207,23 @@ const Blog = (props: Props) => {
               </CardActions>
             </Card>
           ))}
+          <Box
+            color={"text.primary"}
+            textAlign={"center"}
+            display={"flex"}
+            justifyContent={"center"}
+          >
+            <Pagination
+              count={pageCount}
+              onChange={handlePageChange}
+              color="primary"
+              page={currentPage}
+            />
+          </Box>
         </Box>
         <PostAdd />
       </Box>
     </Layout>
   );
 };
-
 export default Blog;
