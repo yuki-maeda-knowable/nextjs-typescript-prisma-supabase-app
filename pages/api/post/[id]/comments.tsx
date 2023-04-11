@@ -15,8 +15,13 @@ export default async function handler(
 
   const postId = String(id);
 
-  //コメントを取得する
+  //コメントを投稿順で取得する
   const comments = await prisma.comments.findMany({
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+    ],
     where: {
       postId: postId,
     },

@@ -13,6 +13,7 @@ model Post {
   title     String
   content   String?
   published Boolean     @default(false)
+  createdAt DateTime    @default(now())
   author    User?       @relation(fields: [authorId], references: [id])
   authorId  String?
   favorites Favorites[]
@@ -110,5 +111,4 @@ model Comments {
   userId    String
   Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-
 }

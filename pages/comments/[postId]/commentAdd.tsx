@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import { getSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 // serverSidePropsでpostIdを取得
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -34,22 +35,25 @@ const CommentAdd = ({ userId, postId }) => {
   const [comment, setComment] = useState("");
 
   // コメントを投稿する
-  const handleCommentAdd = useCallback(async () => {
-    //apiで/post/indexにpostする
-    try {
-      const res = await fetch("/api/comment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ comment, postId, userId }),
-      });
-      const data = await res.json();
-
-      router.push(`/p/${postId}`);
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
-    }
-  }, [comment]);
+  const handleCommentAdd = useCallback(
+    async (e) => {
+      //apiで/post/indexにpostする
+      e.preventDefault();
+      try {
+        const res = await fetch("/api/comment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment, postId, userId }),
+        });
+        await res.json();
+        router.push(`/p/${postId}`);
+      } catch (error) {
+        console.error(error);
+        throw new Error(error);
+      }
+    },
+    [comment]
+  );
 
   return (
     <Layout>
@@ -66,6 +70,7 @@ const CommentAdd = ({ userId, postId }) => {
           flexDirection={"column"}
           width={500}
         >
+          <Link href={`/p/${postId}`}>戻る</Link>
           <Stack
             component="form"
             onSubmit={handleCommentAdd}

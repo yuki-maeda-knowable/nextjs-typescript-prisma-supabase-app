@@ -32,12 +32,20 @@ export default async function handler(
       where: {
         published: true,
       },
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
       include: {
         author: {
           select: { name: true, image: true },
         },
       },
     });
-    return res.status(200).json(data);
+    //Date型をJsonに変換して返す
+    const newData = JSON.parse(JSON.stringify(data));
+
+    return res.status(200).json(newData);
   }
 }

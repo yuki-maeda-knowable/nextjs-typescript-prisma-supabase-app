@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const post = await prisma.post.findUnique({
+  const data = await prisma.post.findUnique({
     where: {
       id: String(context?.params?.id),
     },
@@ -43,6 +43,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     },
   });
+
+  //日付をJSONに変換
+  const post = JSON.parse(JSON.stringify(data));
   return {
     props: post,
   };
