@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Checkbox, IconButton, Typography } from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import useFavorite from "../hooks/useFavorite";
 import useFavoriteCount from "../hooks/useFavoriteCount";
 
@@ -16,11 +16,14 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
   const { mutate: mutateFavoriteCount, data: favoriteCount = 0 } =
     useFavoriteCount(postId);
 
-  const isFavorite = useMemo(() => {
+  //いいねされているかを判定するstate
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
+  //useEffectを利用して、いいねされているかを判定する
+  useEffect(() => {
     const list = favoriteData.map((item) => item.postId);
-    //listにpostIdが含まれているかをtrue, falseで返す
-    return list.includes(postId);
-  }, [favoriteData]);
+    setIsFavorite(list.includes(postId));
+  }, [favoriteData, postId]);
 
   const toggleFavorite = useCallback(async () => {
     //いいねの登録/削除を行う
@@ -37,10 +40,12 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
     //いいねの登録が完了したら、いいねの情報を返す
     const data = await res.json();
 
+    //いいねの反転
+    setIsFavorite(!isFavorite);
     //いいねしたリストのキャッシュを更新する
     //最初に取得したリストを、いいねした/いいね削除したリストを更新する
-    // mutateFavorites([...favoriteData, data]);
-    mutateFavorites();
+    mutateFavorites([...favoriteData, data]);
+    // mutateFavorites();
     //いいねの数も更新する
     mutateFavoriteCount();
   }, [isFavorite, postId, mutateFavorites]);
