@@ -16,6 +16,7 @@ import {
   Box,
   Button,
   Pagination,
+  Chip,
 } from "@mui/material";
 import { Share } from "@mui/icons-material";
 import getProfile from "../lib/getProfile";
@@ -24,7 +25,7 @@ import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { useEffect } from "react";
-import ReactPaginate from "react-paginate";
+import useTags from "../hooks/useTags";
 
 type Props = {
   feed: PostProps[];
@@ -85,10 +86,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Blog = (props: Props) => {
   const { data: currentUser } = useCurrentUser();
-
   const { data: posts, mutate: mutatePosts, error } = usePost();
 
-  // ----------------
+  //tagの一覧を取得
+  const { data: tags, mutate: mutateTags } = useTags();
+
+  // postsに変更があったら再レンダリング
+  useEffect(() => {
+    mutatePosts();
+    mutateTags();
+  }, [posts, tags]);
+
+  // ---- pagination start ------------
   // 1ページに表示する記事数
   const itemsPerPage = 5;
   //1ページ目に表示させる最初の添字
@@ -107,12 +116,13 @@ const Blog = (props: Props) => {
     pageIndex: number
   ) => {
     setCurrentPage(pageIndex);
-    console.log(pageIndex);
     const selectedPage = pageIndex - 1;
     const newOffset = (selectedPage * itemsPerPage) % posts?.length;
     setItemsOffset(newOffset);
   };
+  // ---- pagination end ------------
 
+  // ---- post delete start ------------
   const handleDeletePost = async (id: string) => {
     //apiを叩いて削除
     const res = await fetch(`/api/post/${id}`, {
@@ -121,10 +131,7 @@ const Blog = (props: Props) => {
     await res.json();
     mutatePosts();
   };
-
-  useEffect(() => {
-    mutatePosts();
-  }, [posts]);
+  // ---- post delete end ------------
 
   if (!posts) {
     return (
@@ -137,30 +144,47 @@ const Blog = (props: Props) => {
   return (
     <Layout>
       <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
-        <Box>
-          <Typography
-            variant="h5"
-            sx={{ color: "whitesmoke", display: "inline-block" }}
-          >
-            Public Feed
-          </Typography>
-        </Box>
-        <Box sx={{ display: "inline-block" }}>
-          <Typography color="whitesmoke" variant="h6">
-            <Link href={`/profile/${currentUser?.id}`}>
-              <a>
-                {props?.profile?.nickname
-                  ? props?.profile?.nickname
-                  : currentUser?.name}
-                のプロフィール
-              </a>
-            </Link>
-          </Typography>
-        </Box>
-        <Box sx={{ marginTop: "10px" }}>
-          <Typography color="whitesmoke" variant="h6">
-            {posts?.length ? posts?.length : 0} Posts
-          </Typography>
+        <Box
+          display={"flex"}
+          justifyContent={"space-between"}
+          color={"text.primary"}
+        >
+          <Box display={"flex"} flexDirection={"column"}>
+            <Typography variant="h5" sx={{ color: "whitesmoke" }}>
+              Public Feed
+            </Typography>
+            <Typography color="whitesmoke" variant="h6">
+              {posts?.length ? posts?.length : 0} Posts
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", flexDirection: "column", width: "30%" }}>
+            <Typography color="whitesmoke" variant="h6">
+              <Link href={`/profile/${currentUser?.id}`}>
+                <a>
+                  {props?.profile?.nickname
+                    ? props?.profile?.nickname
+                    : currentUser?.name}
+                  のプロフィール
+                </a>
+              </Link>
+            </Typography>
+            <Box
+              display={"flex"}
+              width={"100%"}
+              height={"100px"}
+              flexWrap={"wrap"}
+            >
+              {tags?.map((tag) => (
+                <Link href={`/tags/${tag?.id}`} key={tag?.id}>
+                  <Chip
+                    label={"#" + tag?.name}
+                    variant="outlined"
+                    sx={{ cursor: "pointer" }}
+                  />
+                </Link>
+              ))}
+            </Box>
+          </Box>
         </Box>
         <Box>
           {currentPosts?.map((post) => (
