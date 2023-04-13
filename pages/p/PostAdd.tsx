@@ -13,15 +13,23 @@ import { Add as AddIcon } from "@mui/icons-material";
 import styled from "@emotion/styled";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
 import usePost from "../../hooks/usePost";
 import { useCallback } from "react";
+import TagInput from "../../components/TagInput";
+import useCurrentUser from "../../hooks/useCurrentUser";
+import useTags from "../../hooks/useTags";
 
 interface PostInput {
   title: string;
   content: string;
   published: boolean;
 }
+
+type Tags = {
+  id?: number;
+  name: string;
+};
+
 const StyleModal = styled(Modal)({
   display: "flex",
   alignItems: "center",
@@ -35,13 +43,10 @@ const UserBox = styled(Box)({
   marginBottom: "20px",
 });
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-
-// };
 export default function PostAdd() {
   const { data: session } = useSession();
-  const router = useRouter();
-  const userImg = session?.user?.image;
+  const { data: user } = useCurrentUser();
+  const userImg = user?.image;
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -52,49 +57,75 @@ export default function PostAdd() {
     setOpen(false);
   };
 
+  // ---- tag search start ------------
+  const [tags, setTags] = useState<Tags[]>([]);
+
+  const { data: tagsData, mutate: mutateTags } = useTags();
+  const [suggestions, setSuggestions] = useState(tagsData);
+
+  const onDelete = useCallback(
+    (tagIndex) => {
+      setTags(tags.filter((_, i) => i !== tagIndex));
+    },
+    [tags]
+  );
+
+  const onAddition = useCallback(
+    (newTag) => {
+      // const modifiedTag = { ...newTag, name: `#${newTag.name}` };
+      // setTags([...tags, modifiedTag]);
+      setTags([...tags, newTag]);
+    },
+    [tags]
+  );
+
+  // ---- tag search end ------------
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<PostInput>({
     defaultValues: {
       title: "",
       content: "",
-      published: false,
+      published: true,
     },
   });
 
   // postsの一覧を取得しておく
   const { data: posts, mutate: mutatePosts } = usePost();
 
-  const submitPostRegister = useCallback(
-    async (input: PostInput) => {
-      const { title, content, published } = input;
-      const postData = {
-        title: title,
-        content: content,
-        published: published,
-      };
+  const submitPostRegister = async (input: PostInput) => {
+    const { title, content, published } = input;
 
-      try {
-        const res = await fetch(`/api/post`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "Application/json",
-          },
-          body: JSON.stringify(postData),
-        });
-        const data = await res.json();
-        //postが追加されたら、キャッシュを更新する
-        mutatePosts([...posts, data]);
+    const postData = {
+      title: title,
+      content: content,
+      published: published,
+      tags: tags,
+    };
 
-        router.push("/p/drafts");
-      } catch (error) {
-        console.error("Error registration Post: ", error);
-      }
-    },
-    [mutatePosts, posts]
-  );
+    try {
+      const res = await fetch(`/api/post`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "Application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+      const data = await res.json();
+      //postが追加されたら、キャッシュを更新する
+      mutatePosts([...posts, data]);
+      mutateTags([...tagsData, data.tags]);
+      handleClose(); // モーダルを閉じる
+      reset(); // フォームをリセットする
+      setTags([]); // タグをリセットする
+    } catch (error) {
+      console.error("Error registration Post: ", error);
+    }
+  };
 
   return (
     <>
@@ -121,8 +152,8 @@ export default function PostAdd() {
         <Box
           component="form"
           onSubmit={handleSubmit(submitPostRegister)}
-          width={400}
-          height={350}
+          width={500}
+          height={"60%"}
           bgcolor={"background.default"}
           borderRadius={5}
           p={2}
@@ -138,8 +169,14 @@ export default function PostAdd() {
               {session?.user?.name}
             </Typography>
           </UserBox>
+          <TagInput
+            tags={tags}
+            suggestions={suggestions}
+            onDelete={onDelete}
+            onAddition={onAddition}
+          />
           <TextField
-            sx={{ width: 300, marginBottom: 2 }}
+            sx={{ width: 450, mt: 2, mb: 2 }}
             {...register("title", { required: "入力必須" })}
             label="title"
             type="text"
@@ -149,8 +186,9 @@ export default function PostAdd() {
           {errors.title && (
             <span style={{ color: "red" }}>{errors.title?.message}</span>
           )}
+
           <TextField
-            sx={{ width: 300, marginBottom: 2 }}
+            sx={{ width: 450, mt: 2, mb: 2 }}
             {...register("content", { required: "入力必須" })}
             label="content"
             type="text"
@@ -163,7 +201,12 @@ export default function PostAdd() {
             <span style={{ color: "red" }}>{errors.content?.message}</span>
           )}
           <Box>
-            <Button variant="outlined" color="primary" type="submit">
+            <Button
+              variant="outlined"
+              color="primary"
+              type="submit"
+              sx={{ mt: 4, width: "100%" }}
+            >
               Post
             </Button>
           </Box>
