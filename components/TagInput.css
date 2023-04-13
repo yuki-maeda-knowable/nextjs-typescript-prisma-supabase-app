@@ -1,0 +1,63 @@
+.react-tags {
+  position: relative;
+  padding: 3px 0 0 3px;
+  border: 1px solid #d1d1d1;
+  border-radius: 10px;
+
+  /* shared font styles */
+  font-size: 1em;
+  line-height: 1.2;
+
+  /* clicking anywhere will focus the input */
+  cursor: text;
+}
+
+.react-tags.is-focused {
+  border-color: #b1b1b1;
+}
+
+.react-tags__selected {
+  display: inline;
+}
+
+.react-tags__selected-tag {
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 0 3px 3px 0;
+  padding: 3px 4px;
+  border: 1px solid #d1d1d1;
+  border-radius: 6px;
+  background: #f1f1f1;
+
+  /* match the font styles */
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.react-tags__selected-tag:after {
+  content: "\2715";
+  color: #aaa;
+  margin-left: 8px;
+}
+
+.react-tags__selected-tag:hover,
+.react-tags__selected-tag:focus {
+  border-color: #b1b1b1;
+}
+
+.react-tags__search {
+  display: inline-block;
+
+  /* match tag layout */
+  padding: 4px 2px;
+  /* margin-bottom: 6px; */
+
+  /* prevent autoresize overflowing the container */
+  max-width: 100%;
+}
+
+.react-tags__search-input {
+  border-radius: 5px;
+  margin-bottom: 2px;
+  padding: 4px 0;
+}
