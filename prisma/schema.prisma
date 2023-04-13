@@ -18,6 +18,7 @@ model Post {
   authorId  String?
   favorites Favorites[]
   comments  Comments[]
+  PostTags  PostTags[]
 }
 
 model User {
@@ -111,4 +112,20 @@ model Comments {
   userId    String
   Post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
+}
+
+//tag検索機能のためのテーブルを作成。postテーブルを紐づく中間テーブルも作成する
+model Tags {
+  id       String     @id @default(cuid())
+  name     String
+  PostTags PostTags[]
+}
+
+//中間テーブル
+model PostTags {
+  id     String @id @default(cuid())
+  Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+  Tags   Tags   @relation(fields: [tagsId], references: [id], onDelete: Cascade)
+  tagsId String
 }

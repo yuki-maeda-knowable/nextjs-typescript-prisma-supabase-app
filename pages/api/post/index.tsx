@@ -8,10 +8,10 @@ export default async function handler(
 ) {
   if (req.method === "POST") {
     const { title, content, published, tags } = req.body;
-    //   // ログインしているユーザのsession情報を取得
+    // ログインしているユーザのsession情報を取得
     const session = await getSession({ req });
     const { email } = session.user;
-    //   // すでに登録されているタグの一覧を取得
+    // すでに登録されているタグの一覧を取得
     const existingTags = await prisma.tags.findMany({});
     //tagsとexistingTagsを比較して、同じタグがあれば、そのタグを返す。trueであれば、タグの登録はせず、postの登録と中間テーブルの登録を行う
     const filteredExistingTags = existingTags.filter((existingTag) =>
