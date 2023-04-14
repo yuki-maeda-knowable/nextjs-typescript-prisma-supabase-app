@@ -20,8 +20,6 @@ import { useState } from "react";
 
 //getServerSidePropsでタグに紐づく投稿を取得する。型も定義しながら
 export const getServerSideProps = async (context) => {
-  console.log(context);
-
   const { id } = context.query;
 
   //prismaでタグに紐づく投稿を降順で取得する
@@ -55,7 +53,8 @@ export const getServerSideProps = async (context) => {
 
 const TagsPosts = (props) => {
   const { posts } = props;
-  const post = posts[0].PostTags;
+
+  const post = posts[0]?.PostTags;
 
   const { data: user } = useCurrentUser();
 
@@ -97,7 +96,7 @@ const TagsPosts = (props) => {
   // ---- post delete end ------------
 
   //もしタグに紐づく投稿がなければ、タグに紐づく記事はないと表示
-  if (post.length === 0) {
+  if (post?.length === 0) {
     return (
       <Layout>
         <Box color={"text.primary"}>
