@@ -5,7 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  //Getだったら、タグの一覧を返す
+  //Getだったら、使用回数の多いタグ名を10件返す
   if (req.method === "GET") {
     try {
       const data = await prisma.tags.findMany();

@@ -11,17 +11,51 @@ export default async function handler(
     // ログインしているユーザのsession情報を取得
     const session = await getSession({ req });
     const { email } = session.user;
-    // すでに登録されているタグの一覧を取得
-    const existingTags = await prisma.tags.findMany({});
-    //tagsとexistingTagsを比較して、同じタグがあれば、そのタグを返す。trueであれば、タグの登録はせず、postの登録と中間テーブルの登録を行う
-    const filteredExistingTags = existingTags.filter((existingTag) =>
-      tags.some((tag) => tag.name === existingTag.name)
-    );
-    console.log(
-      "filteredExistingTags: " + JSON.stringify(filteredExistingTags, null, 2)
-    );
-    // filteredExistingTagsがtrueであれば、tagsテーブルへの登録は行わない
-    if (filteredExistingTags.length > 0) {
+
+    //tagsがなければ、postのみ登録する
+    if (tags.length === 0) {
+      const post = await prisma.post.create({
+        data: {
+          title: title,
+          content: content,
+          published: published,
+          // 登録しているユーザでemailがログインしているユーザであるか
+          author: {
+            connect: {
+              email: email,
+            },
+          },
+        },
+      });
+      return res.status(200).json(post);
+    }
+
+    // tagsがあれば、tag, post, postTagsに登録する
+    if (tags.length > 0) {
+      // tagsの中で新規登録のタグを取得する
+      const newTags = tags.filter((tag) => !tag.id);
+
+      // 新規タグがあれば登録する
+      if (newTags) {
+        await Promise.all(
+          newTags.map(async (tag) => {
+            return await prisma.tags.create({
+              data: {
+                name: tag.name,
+              },
+            });
+          })
+        );
+      }
+      // タグの一覧を取得する
+      const existingTags = await prisma.tags.findMany({});
+
+      // 新規登録したタグはidがないので、idを取得する
+      const filteredExistingTags = existingTags.filter((existingTag) =>
+        tags.some((tag) => tag.name === existingTag.name)
+      );
+
+      // tagsに紐づくpostを登録する
       const post = await prisma.post.create({
         data: {
           title: title,
@@ -35,7 +69,7 @@ export default async function handler(
           },
           // tagsの配列をmapで回して、中間テーブルに登録する
           PostTags: {
-            create: tags.map((tag) => ({
+            create: filteredExistingTags.map((tag) => ({
               Tags: {
                 connect: {
                   id: tag.id,
@@ -46,43 +80,11 @@ export default async function handler(
         },
       });
       return res.status(200).json(post);
-    } else {
-      console.log("filteredExistingTagsがない");
-
-      //タグに重複がなければ、tagsテーブルに登録する
-      //postに紐づくタグも登録するし、中間テーブルにも登録する
-      const post = await Promise.all(
-        tags.map(async (tag) => {
-          return await prisma.post.create({
-            data: {
-              title: title,
-              content: content,
-              published: published,
-              // 登録しているユーザでemailがログインしているユーザであるか
-              author: {
-                connect: {
-                  email: email,
-                },
-              },
-              // tagsの配列をmapで回して、中間テーブルとtagsテーブルに登録する
-              PostTags: {
-                create: {
-                  Tags: {
-                    create: {
-                      name: tag.name,
-                    },
-                  },
-                },
-              },
-            },
-          });
-        })
-      );
-      console.log(post);
-
-      return res.status(200).json(post);
     }
-  } else if (req.method === "GET") {
+  }
+
+  // GETリクエストの場合
+  if (req.method === "GET") {
     const data = await prisma.post.findMany({
       orderBy: [
         {

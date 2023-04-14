@@ -26,7 +26,8 @@ import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { useEffect } from "react";
 import useTags from "../hooks/useTags";
-
+import Grid from "@mui/material/Grid"; // Grid version 1
+import useSortedTags from "../hooks/useSortedTags";
 type Props = {
   feed: PostProps[];
   keyword: string;
@@ -90,16 +91,18 @@ const Blog = (props: Props) => {
 
   //tagの一覧を取得
   const { data: tags, mutate: mutateTags } = useTags();
+  const { data: sortedTags, mutate: mutateSortedTags } = useSortedTags();
 
   // postsに変更があったら再レンダリング
   useEffect(() => {
     mutatePosts();
-    mutateTags();
-  }, [posts, tags]);
+    // mutateTags();
+    mutateSortedTags();
+  }, [posts, sortedTags]);
 
   // ---- pagination start ------------
   // 1ページに表示する記事数
-  const itemsPerPage = 5;
+  const itemsPerPage = 6;
   //1ページ目に表示させる最初の添字
   const [itemsOffset, setItemsOffset] = useState(0);
   //1ページ目の最後に表示させる添字
@@ -174,7 +177,7 @@ const Blog = (props: Props) => {
               height={"100px"}
               flexWrap={"wrap"}
             >
-              {tags?.map((tag) => (
+              {sortedTags?.map((tag) => (
                 <Link href={`/tags/${tag?.id}`} key={tag?.id}>
                   <Chip
                     label={"#" + tag?.name}
@@ -186,64 +189,74 @@ const Blog = (props: Props) => {
             </Box>
           </Box>
         </Box>
-        <Box>
-          {currentPosts?.map((post) => (
-            <Card
-              key={post.id}
-              sx={{ margin: 3, ":hover": { opacity: "0.8" } }}
-            >
-              <CardHeader
-                avatar={
-                  <Avatar
-                    sx={{ bgcolor: "white" }}
-                    aria-label="recipe"
-                    src={post?.author?.image}
-                  ></Avatar>
-                }
-                title={post.title}
-              />
-              <Link href={`/p/${post.id}`}>
-                <CardContent sx={{ cursor: "pointer" }}>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    whiteSpace={"pre-wrap"}
-                  >
-                    {post.content}
-                  </Typography>
-                </CardContent>
-              </Link>
-              <CardActions disableSpacing>
-                <FavoriteButton postId={post.id} />
-                <IconButton aria-label="share">
-                  <Share />
-                </IconButton>
-                {/* 投稿者とログインユーザが同じなら表示 */}
-                {currentUser?.id === post?.authorId && (
-                  <Button
-                    onClick={() => {
-                      handleDeletePost(post.id);
-                    }}
-                  >
-                    削除
-                  </Button>
-                )}
-              </CardActions>
-            </Card>
-          ))}
-          <Box
-            color={"text.primary"}
-            textAlign={"center"}
-            display={"flex"}
-            justifyContent={"center"}
-          >
-            <Pagination
-              count={pageCount}
-              onChange={handlePageChange}
-              color="primary"
-              page={currentPage}
-            />
-          </Box>
+        <Box width={"100%"}>
+          <Grid container spacing={2}>
+            {currentPosts?.map((post) => (
+              <Grid item xs={12} sm={6} md={4} key={post.id}>
+                <Card sx={{ margin: 1, ":hover": { opacity: "0.8" } }}>
+                  <CardHeader
+                    avatar={
+                      <Avatar
+                        sx={{ bgcolor: "white" }}
+                        aria-label="recipe"
+                        src={post?.author?.image}
+                      ></Avatar>
+                    }
+                    title={post.title}
+                  />
+                  <Link href={`/p/${post.id}`}>
+                    <CardContent
+                      sx={{
+                        cursor: "pointer",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        height: "100px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        color="text.primary"
+                        whiteSpace={"pre-wrap"}
+                      >
+                        {post.content}
+                      </Typography>
+                    </CardContent>
+                  </Link>
+                  <CardActions disableSpacing>
+                    <FavoriteButton postId={post.id} />
+                    <IconButton aria-label="share">
+                      <Share />
+                    </IconButton>
+                    {/* 投稿者とログインユーザが同じなら表示 */}
+                    {currentUser?.id === post?.authorId && (
+                      <Button
+                        onClick={() => {
+                          handleDeletePost(post.id);
+                        }}
+                      >
+                        削除
+                      </Button>
+                    )}
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+        <Box
+          color={"text.primary"}
+          textAlign={"center"}
+          display={"flex"}
+          justifyContent={"center"}
+          mt={2}
+        >
+          <Pagination
+            count={pageCount}
+            onChange={handlePageChange}
+            color="primary"
+            page={currentPage}
+          />
         </Box>
         <PostAdd />
       </Box>
