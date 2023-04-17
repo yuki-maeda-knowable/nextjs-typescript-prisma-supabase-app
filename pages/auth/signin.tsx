@@ -6,6 +6,7 @@ import Layout from "../../components/Layout";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
+import { ChangeEvent } from "react";
 
 const Signin: NextPage = () => {
   const router = useRouter();
@@ -81,7 +82,7 @@ const Signin: NextPage = () => {
                 id="name"
                 label="name"
                 type="text"
-                onChange={(e: any) => {
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
                   setName(e.target.value);
                 }}
                 value={name}
@@ -92,7 +93,7 @@ const Signin: NextPage = () => {
               id="email"
               label="email"
               type="email"
-              onChange={(e: any) => {
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setEmail(e.target.value);
               }}
               value={email}
@@ -102,7 +103,7 @@ const Signin: NextPage = () => {
               id="password"
               label="password"
               type="password"
-              onChange={(e: any) => {
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setPassword(e.target.value);
               }}
               value={password}
