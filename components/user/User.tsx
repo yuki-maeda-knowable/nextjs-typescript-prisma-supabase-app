@@ -1,17 +1,7 @@
 import React from "react";
-import { PostProps } from "../Post";
 import Link from "next/link";
 import { useRouter } from "next/router";
-export type UserProps = {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  password: string;
-  createdAt?: string;
-  updatedAt?: string;
-  posts?: PostProps[];
-};
+import { UserProps } from "../../types/interface";
 
 const User: React.FC<{ user: UserProps }> = ({ user }) => {
   const router = useRouter();

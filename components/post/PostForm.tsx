@@ -2,12 +2,12 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import Layout from "../Layout";
 import { Container, Typography, Stack, TextField, Button } from "@mui/material";
-
-interface PostInput {
-  title: string;
-  content: string;
-  published: boolean;
-}
+import { PostProps } from "../../types/interface";
+// interface PostProps {
+//   title: string;
+//   content: string;
+//   published: boolean;
+// }
 
 export default function PostForm() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function PostForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<PostInput>({
+  } = useForm<PostProps>({
     defaultValues: {
       title: "",
       content: "",
@@ -23,7 +23,7 @@ export default function PostForm() {
     },
   });
 
-  const submitPostRegister = async (input: PostInput) => {
+  const submitPostRegister = async (input: PostProps) => {
     const { title, content, published } = input;
     const postData = {
       title: title,
@@ -39,8 +39,8 @@ export default function PostForm() {
         },
         body: JSON.stringify(postData),
       });
-      const data = await res.json();
-      router.push("/p/drafts");
+      await res.json();
+      router.push("/");
     } catch (error) {
       console.error("Error registration Post: ", error);
     }

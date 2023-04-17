@@ -1,16 +1,7 @@
 import { TextField } from "@mui/material";
+import { SignInProps } from "../../types/interface";
 
-interface UserInput {
-  id: string;
-  label: string;
-  value: string;
-  type?: string;
-  onChange?: any;
-  placeholder?: string;
-  rows?: number;
-}
-
-const UserInputForm: React.FC<UserInput> = ({
+const UserInputForm: React.FC<SignInProps> = ({
   id,
   label,
   value,

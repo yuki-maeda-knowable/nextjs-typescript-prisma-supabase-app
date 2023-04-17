@@ -22,19 +22,14 @@ import crypto from "crypto";
 import { AddAPhoto, HighlightOff } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-export type Profile = {
-  nickname?: string;
-  photo?: [];
-  gender?: number;
-  birthday?: Date;
-};
+import { ProfileFormProps } from "../../types/interface";
 
 const ProfileForm = ({ profile }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Profile>({});
+  } = useForm<ProfileFormProps>({});
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -50,6 +45,8 @@ const ProfileForm = ({ profile }) => {
 
   // //プロフィールのデータが既にあったら読み込んでおく
   useEffect(() => {
+    console.log(profile);
+
     //プロフィールのデータが既にあったら読み込んでおく
     if (profile) {
       setVariant("update");
@@ -117,8 +114,7 @@ const ProfileForm = ({ profile }) => {
   };
 
   // 送信ボタンが押されたら
-  const registerProfile = async (profile: Profile) => {
-    alert("register");
+  const registerProfile = async (profile: ProfileFormProps) => {
     //画像があるか判断。あればランダム文字列生成
     if (profileImage?.length != 0) {
       const urls = await Promise.all(
@@ -142,7 +138,6 @@ const ProfileForm = ({ profile }) => {
       );
     }
     const { nickname, gender, birthday } = profile;
-    alert(birthday);
     const formData = {
       nickname: nickname,
       birthday: birthday,
@@ -162,7 +157,7 @@ const ProfileForm = ({ profile }) => {
   };
 
   // TODO: 画像の更新処理(未実装).nicknameは更新できる
-  const updateProfile = async (profile: Profile) => {
+  const updateProfile = async (profile: ProfileFormProps) => {
     const { nickname } = profile;
     const formData = {
       nickname: nickname,
