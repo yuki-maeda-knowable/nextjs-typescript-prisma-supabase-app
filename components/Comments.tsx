@@ -14,7 +14,7 @@ const Comments = ({ postId }) => {
   const { data: comments, mutate: mutateComment } = useComments(postId);
 
   const handleCommentDelete = async (commentId) => {
-    const res = await fetch(`/api/comment/${commentId}`, {
+    await fetch(`/api/comment/${commentId}`, {
       method: "DELETE",
     });
     router.push(`/p/${postId}`);

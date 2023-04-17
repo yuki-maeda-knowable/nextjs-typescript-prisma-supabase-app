@@ -10,3 +10,5 @@ const useCommentDetail = (id: string) => {
     isError: error,
   };
 };
+
+export default useCommentDetail;

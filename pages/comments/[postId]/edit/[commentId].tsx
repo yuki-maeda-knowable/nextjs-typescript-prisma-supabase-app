@@ -6,18 +6,20 @@ import UserInputForm from "../../../../components/auth/userInputForm";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { CommentEditProps } from "../../../../types/interface";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
-interface commentEditProps {
-  userId: string;
-  postId: string;
+type Params = {
   commentId: string;
-}
-export const getServerSideProps = async (context) => {
+};
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext<Params>
+) => {
   const session = await getSession(context);
-  const { postId, commentId } = context.params;
-  const comment = await getCommentDetail(commentId);
+  const { commentId } = context.params;
 
-  const userId = session?.user?.id;
+  const comment: CommentEditProps = await getCommentDetail(commentId);
+
   if (!session) {
     return {
       redirect: {
@@ -29,31 +31,28 @@ export const getServerSideProps = async (context) => {
   return {
     props: {
       comment,
-      userId,
-      commentId,
-      postId,
     },
   };
 };
 
-const CommentEdit = ({ comment, commentId, postId }) => {
+const CommentEdit = ({ comment }: { comment: CommentEditProps }) => {
+  const { content, postId, id } = comment[0];
+
   const router = useRouter();
   //入力された値をstateに保存
-  const [content, setContent] = useState("");
+  const [editComment, setEditComment] = useState("");
   //画面がレンダリングされたときに実行
   useEffect(() => {
-    if (comment) {
-      setContent(comment[0].content);
-    }
-  }, [comment]);
+    setEditComment(content);
+  }, []);
 
   const submitCommentEdit = async () => {
-    const res = await fetch(`/api/comment/${commentId}`, {
+    await fetch(`/api/comment/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ content, commentId }),
+      body: JSON.stringify({ editComment, id }),
     });
     router.push(`/p/${postId}`);
   };
@@ -77,8 +76,8 @@ const CommentEdit = ({ comment, commentId, postId }) => {
               id="content"
               label="content"
               type="text"
-              onChange={(e) => setContent(e.target.value)}
-              value={content}
+              onChange={(e) => setEditComment(e.target.value)}
+              value={editComment}
               rows={3}
             />
             <Button onClick={submitCommentEdit}>送信</Button>

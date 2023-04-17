@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { Box, Typography, Stack, TextField, Button } from "@mui/material";
+import { Box, Typography, Stack, Button } from "@mui/material";
 import Layout from "../../../components/Layout";
 import UserInputForm from "../../../components/auth/userInputForm";
 import { useCallback } from "react";
 import { getSession } from "next-auth/react";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
 // serverSidePropsでpostIdを取得
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getSession(context);
   const { postId } = context.params;
   const userId = session?.user?.id;
@@ -29,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const CommentAdd = ({ userId, postId }) => {
+const CommentAdd = ({ userId, postId }: { userId: string; postId: string }) => {
   const router = useRouter();
   //commentの状態を管理
   const [comment, setComment] = useState("");

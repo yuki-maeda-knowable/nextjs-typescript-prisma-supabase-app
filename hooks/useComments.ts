@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import fetcher from "../lib/fetcher";
 
-export default function useComments(postId: string) {
+const useComments = (postId: string) => {
   const { data, error, mutate } = useSWR(
     postId ? `/api/post/${postId}/comments` : null,
     fetcher
@@ -12,4 +12,6 @@ export default function useComments(postId: string) {
     error,
     mutate,
   };
-}
+};
+
+export default useComments;

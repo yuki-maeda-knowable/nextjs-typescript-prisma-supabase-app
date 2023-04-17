@@ -13,15 +13,14 @@ export default async function handler(
     if (!user) return res.status(401).end();
 
     try {
-      const { commentId, content } = req.body;
+      const { id, editComment } = req.body;
       const updateComment = await prisma.comments.update({
-        where: { id: String(commentId) },
-        data: { content: content },
+        where: { id: id },
+        data: { content: editComment },
       });
       res.status(200).json(updateComment);
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      res.status(500).json({ error: "コメントの更新に失敗しました" });
     }
   }
   //DELETEメソッドだったらコメントを削除する
@@ -36,8 +35,7 @@ export default async function handler(
       });
       res.status(200).json({ message: "コメントを削除しました" });
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      res.status(500).json({ error: "コメントの削除に失敗しました" });
     }
   }
 }
