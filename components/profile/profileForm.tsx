@@ -33,22 +33,20 @@ const ProfileForm = ({ profile }) => {
 
   const router = useRouter();
   const { data: session } = useSession();
-  const [gender, setGender] = useState("");
-  const [birthday, setBirthday] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [gender, setGender] = useState("1");
+  const [birthday, setBirthday] = useState<string>("");
+  const [nickname, setNickname] = useState<string>("");
   const maxImagesUpload = 4;
   const [profileImage, setProfileImage] = useState([]);
   const [createObjectURL, setCreateObjectURL] = useState([]);
-  const [photoUrls, setPhotoUrls] = useState([]);
-  const [variant, setVariant] = useState("register");
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [variant, setVariant] = useState<string>("register");
   const userId = session?.user?.id;
 
   // //プロフィールのデータが既にあったら読み込んでおく
   useEffect(() => {
-    console.log(profile);
-
     //プロフィールのデータが既にあったら読み込んでおく
-    if (profile) {
+    if (profile.id) {
       setVariant("update");
       setProfileImage(profile.Photo);
       setCreateObjectURL(profile.Photo);
@@ -58,7 +56,7 @@ const ProfileForm = ({ profile }) => {
         photoUrls.push(url.url);
       });
     }
-  }, [profile]);
+  }, []);
 
   const handleChangeNickname = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNickname(e.target.value);
@@ -104,7 +102,7 @@ const ProfileForm = ({ profile }) => {
     const res = await fetch(`/api/photo/${photoId}`, {
       method: "DELETE",
     });
-    const data = await res.json();
+    await res.json();
     const newImage = [...profileImage];
     const newImageUrl = [...createObjectURL];
     newImage.splice(index, 1);
