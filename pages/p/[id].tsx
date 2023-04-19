@@ -1,7 +1,7 @@
 import React from "react";
 import { GetServerSideProps } from "next";
 import Layout from "../../components/Layout";
-import { PostProps } from "../../components/Post";
+import { PostProps } from "../../types/interface";
 import prisma from "../../lib/prisma";
 import {
   Avatar,
@@ -53,7 +53,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Post: React.FC<PostProps> = (post) => {
   const { data: user } = useCurrentUser();
-  const { data: author } = useUser(post.authorId);
+  const authorId = (post.authorId as string) ?? "";
+  const { data: author } = useUser(authorId);
 
   return (
     <Layout>
@@ -70,7 +71,7 @@ const Post: React.FC<PostProps> = (post) => {
             }
             title={post.title}
           />
-          {post?.author?.name || "Unknown author"}
+          {post?.author?.name ? post.author.name : "Unknown author"}
           <CardContent>
             <Typography
               variant="body2"

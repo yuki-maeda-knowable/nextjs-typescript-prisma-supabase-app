@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { GetServerSideProps } from "next";
 import Layout from "../components/Layout";
-import { PostProps } from "../components/Post";
+import { PostProps } from "../types/interface";
 import prisma from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
@@ -17,6 +17,7 @@ import {
   Button,
   Pagination,
   Chip,
+  Grid,
 } from "@mui/material";
 import { Share } from "@mui/icons-material";
 import getProfile from "../lib/getProfile";
@@ -26,7 +27,6 @@ import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { useEffect } from "react";
 import useTags from "../hooks/useTags";
-import Grid from "@mui/material/Grid"; // Grid version 1
 import useSortedTags from "../hooks/useSortedTags";
 type Props = {
   feed: PostProps[];

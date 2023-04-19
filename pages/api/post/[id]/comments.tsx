@@ -10,25 +10,28 @@ export default async function handler(
   //認証を行う
   const user = await serverAuth(req);
   if (!user) return res.status(401).end();
+  try {
+    const { id } = req.query;
 
-  const { id } = req.query;
+    const postId = String(id);
 
-  const postId = String(id);
-
-  //コメントを投稿順で取得する
-  const comments = await prisma.comments.findMany({
-    orderBy: [
-      {
-        createdAt: "desc",
+    //コメントを投稿順で取得する
+    const comments = await prisma.comments.findMany({
+      orderBy: [
+        {
+          createdAt: "desc",
+        },
+      ],
+      where: {
+        postId: postId,
       },
-    ],
-    where: {
-      postId: postId,
-    },
-    include: {
-      User: true,
-    },
-  });
+      include: {
+        User: true,
+      },
+    });
 
-  res.status(200).json(comments);
+    res.status(200).json(comments);
+  } catch (error) {
+    throw new Error("コメントの取得に失敗しました");
+  }
 }

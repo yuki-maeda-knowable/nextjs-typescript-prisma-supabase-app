@@ -39,7 +39,7 @@ export interface SignInProps {
 
 //投稿フォームの型定義
 export interface PostProps {
-  // id: string;
+  id?: string;
   title: string;
   content: string;
   published: boolean;
@@ -68,4 +68,15 @@ export interface PostSearchForm {
 // いいねのボタンの型定義
 export interface FavoriteButtonProps {
   postId: string;
+}
+
+// タグの型定義
+export interface TagProps {
+  id?: string;
+  name: string;
+}
+
+// タグに紐づく投稿の型定義
+export interface TagPostProps {
+  tagPosts: [];
 }
