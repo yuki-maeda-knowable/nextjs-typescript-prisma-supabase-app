@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next";
 import prisma from "../../lib/prisma";
-import { UserProps } from "../../components/user/User";
+import { UserProps } from "../../types/interface";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -22,14 +22,7 @@ import { AddAPhoto } from "@mui/icons-material";
 import { getSession } from "next-auth/react";
 import useCurrentUser from "../../hooks/useCurrentUser";
 
-interface UserInput {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  image?: string;
-}
-type uploadImageUrl = string;
+type UploadImageUrl = string;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -55,19 +48,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const User = (user: UserProps, { UserInput }) => {
+const User = (user: UserProps) => {
   const { data: currentUser } = useCurrentUser();
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState("");
 
   //画像URL
-  const [uploadImageUrl, setUploadImageUrl] = useState<uploadImageUrl>(
-    user.image
+  const [uploadImageUrl, setUploadImageUrl] = useState<UploadImageUrl>(
+    user.image || ""
   );
 
   // supabaseにアップロードする画像ファイル
-  const [uploadImageFile, setUploadImageFile] = useState<File>();
+  const [uploadImageFile, setUploadImageFile] = useState<File | undefined>();
 
   const {
     register,
@@ -76,7 +69,7 @@ const User = (user: UserProps, { UserInput }) => {
   } = useForm<UserProps>({});
 
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = router.query as { id: string };
 
   // 画像が選択されたら、プレビュー
   const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
