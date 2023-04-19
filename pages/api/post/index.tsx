@@ -36,7 +36,7 @@ export default async function handler(
       const newTags = tags.filter((tag) => !tag.id);
 
       // 新規タグがあれば登録する
-      if (newTags > 0) {
+      if (newTags.length > 0) {
         await Promise.all(
           newTags.map(async (tag) => {
             return await prisma.tags.create({
