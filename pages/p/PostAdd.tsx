@@ -18,17 +18,7 @@ import { useCallback } from "react";
 import TagInput from "../../components/TagInput";
 import useCurrentUser from "../../hooks/useCurrentUser";
 import useTags from "../../hooks/useTags";
-
-interface PostInput {
-  title: string;
-  content: string;
-  published: boolean;
-}
-
-type Tags = {
-  id?: number;
-  name: string;
-};
+import { PostProps, TagProps } from "../../types/interface";
 
 const StyleModal = styled(Modal)({
   display: "flex",
@@ -58,7 +48,7 @@ export default function PostAdd() {
   };
 
   // ---- tag search start ------------
-  const [tags, setTags] = useState<Tags[]>([]);
+  const [tags, setTags] = useState<TagProps[]>([]);
 
   const { data: tagsData, mutate: mutateTags } = useTags();
   const [suggestions, setSuggestions] = useState(tagsData);
@@ -86,7 +76,7 @@ export default function PostAdd() {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<PostInput>({
+  } = useForm<PostProps>({
     defaultValues: {
       title: "",
       content: "",
@@ -97,7 +87,7 @@ export default function PostAdd() {
   // postsの一覧を取得しておく
   const { data: posts, mutate: mutatePosts } = usePost();
 
-  const submitPostRegister = async (input: PostInput) => {
+  const submitPostRegister = async (input: PostProps) => {
     const { title, content, published } = input;
 
     const postData = {

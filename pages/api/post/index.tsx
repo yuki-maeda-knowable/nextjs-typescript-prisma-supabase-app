@@ -13,7 +13,7 @@ export default async function handler(
     const { email } = session.user;
 
     //tagsがなければ、postのみ登録する
-    if (tags.length === 0) {
+    if (!tags || tags.length === 0) {
       const post = await prisma.post.create({
         data: {
           title: title,
@@ -36,7 +36,7 @@ export default async function handler(
       const newTags = tags.filter((tag) => !tag.id);
 
       // 新規タグがあれば登録する
-      if (newTags) {
+      if (newTags > 0) {
         await Promise.all(
           newTags.map(async (tag) => {
             return await prisma.tags.create({

@@ -30,7 +30,7 @@ export default async function handler(
       res.status(200).json(post);
     } catch (error) {
       console.log(error);
-      throw new Error("error");
+      throw new Error("投稿の更新に失敗しました");
     }
   } else {
     //methodがgetだったら
@@ -38,7 +38,6 @@ export default async function handler(
       try {
         //idを取得
         const postId = req.query.id;
-        console.log(postId);
 
         //idがなかったら
         if (!postId) return res.status(400).end();
@@ -50,7 +49,7 @@ export default async function handler(
         res.status(200).json(post);
       } catch (error) {
         console.log(error);
-        throw new Error("error");
+        throw new Error("投稿の取得に失敗しました");
       }
     }
   }

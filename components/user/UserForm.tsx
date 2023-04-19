@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import { StaticImageData } from "next/image";
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import crypto from "crypto";
 import Layout from "../Layout";
+import { ProfileProps } from "../../types/interface";
 import {
   Container,
   Stack,
@@ -19,12 +19,6 @@ import { AddAPhoto } from "@mui/icons-material";
 
 // ユーザのデフォルト画像
 const defaultImg = process.env.NEXT_PUBLIC_DEFAULT_IMG;
-interface UserInput {
-  name: string;
-  email: string;
-  password: string;
-  image?: string | StaticImageData;
-}
 
 type uploadImageUrl = string;
 
@@ -36,7 +30,7 @@ export default function UserForm() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<UserInput>({
+  } = useForm<ProfileProps>({
     defaultValues: {
       name: "",
       email: "",
@@ -53,7 +47,7 @@ export default function UserForm() {
     setUploadImageFile(files[0]);
   };
 
-  const submitUserRegister = async (input: UserInput) => {
+  const submitUserRegister = async (input: ProfileProps) => {
     //画像があるか判断
     if (uploadImageFile) {
       const randomString = crypto.randomBytes(10).toString("hex");

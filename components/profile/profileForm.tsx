@@ -22,36 +22,31 @@ import crypto from "crypto";
 import { AddAPhoto, HighlightOff } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-export type Profile = {
-  nickname?: string;
-  photo?: [];
-  gender?: number;
-  birthday?: Date;
-};
+import { ProfileFormProps } from "../../types/interface";
 
 const ProfileForm = ({ profile }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Profile>({});
+  } = useForm<ProfileFormProps>({});
 
   const router = useRouter();
   const { data: session } = useSession();
-  const [gender, setGender] = useState("");
-  const [birthday, setBirthday] = useState("");
-  const [nickname, setNickname] = useState("");
+  const [gender, setGender] = useState("1");
+  const [birthday, setBirthday] = useState<string>("");
+  const [nickname, setNickname] = useState<string>("");
   const maxImagesUpload = 4;
   const [profileImage, setProfileImage] = useState([]);
   const [createObjectURL, setCreateObjectURL] = useState([]);
-  const [photoUrls, setPhotoUrls] = useState([]);
-  const [variant, setVariant] = useState("register");
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [variant, setVariant] = useState<string>("register");
   const userId = session?.user?.id;
 
   // //プロフィールのデータが既にあったら読み込んでおく
   useEffect(() => {
     //プロフィールのデータが既にあったら読み込んでおく
-    if (profile) {
+    if (profile.id) {
       setVariant("update");
       setProfileImage(profile.Photo);
       setCreateObjectURL(profile.Photo);
@@ -61,7 +56,7 @@ const ProfileForm = ({ profile }) => {
         photoUrls.push(url.url);
       });
     }
-  }, [profile]);
+  }, []);
 
   const handleChangeNickname = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNickname(e.target.value);
@@ -107,7 +102,7 @@ const ProfileForm = ({ profile }) => {
     const res = await fetch(`/api/photo/${photoId}`, {
       method: "DELETE",
     });
-    const data = await res.json();
+    await res.json();
     const newImage = [...profileImage];
     const newImageUrl = [...createObjectURL];
     newImage.splice(index, 1);
@@ -117,8 +112,7 @@ const ProfileForm = ({ profile }) => {
   };
 
   // 送信ボタンが押されたら
-  const registerProfile = async (profile: Profile) => {
-    alert("register");
+  const registerProfile = async (profile: ProfileFormProps) => {
     //画像があるか判断。あればランダム文字列生成
     if (profileImage?.length != 0) {
       const urls = await Promise.all(
@@ -142,7 +136,6 @@ const ProfileForm = ({ profile }) => {
       );
     }
     const { nickname, gender, birthday } = profile;
-    alert(birthday);
     const formData = {
       nickname: nickname,
       birthday: birthday,
@@ -162,7 +155,7 @@ const ProfileForm = ({ profile }) => {
   };
 
   // TODO: 画像の更新処理(未実装).nicknameは更新できる
-  const updateProfile = async (profile: Profile) => {
+  const updateProfile = async (profile: ProfileFormProps) => {
     const { nickname } = profile;
     const formData = {
       nickname: nickname,

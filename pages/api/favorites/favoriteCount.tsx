@@ -10,8 +10,12 @@ export default async function handler(
   const user = await serverAuth(req);
   if (!user) return res.status(401).end();
 
-  //いいねの数を取得する
-  const favoriteCount = await prisma.favorites.count({});
+  try {
+    //いいねの数を取得する
+    const favoriteCount = await prisma.favorites.count({});
 
-  res.status(200).json(favoriteCount);
+    res.status(200).json(favoriteCount);
+  } catch (error) {
+    throw new Error("いいねの数の取得に失敗しました");
+  }
 }

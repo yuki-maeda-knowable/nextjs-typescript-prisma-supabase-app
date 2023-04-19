@@ -4,11 +4,7 @@ import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { useCallback, useEffect } from "react";
 import useFavorite from "../hooks/useFavorite";
 import useFavoriteCount from "../hooks/useFavoriteCount";
-
-//親から渡されるpropsの型を定義
-interface FavoriteButtonProps {
-  postId: string;
-}
+import { FavoriteButtonProps } from "../types/interface";
 
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({ postId }) => {
   //useFavoriteを利用して、キャッシュを保持する

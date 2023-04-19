@@ -1,15 +1,11 @@
 import { GetStaticProps } from "next";
 import Layout from "../../components/Layout";
-import User, { UserProps } from "../../components/user/User";
+import User from "../../components/user/User";
 import prisma from "../../lib/prisma";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Loading from "../loading";
-
-//ユーザ一覧の型定義
-type Props = {
-  users: UserProps[];
-};
+import { UserProps } from "../../types/interface";
 
 export const getStaticProps: GetStaticProps = async () => {
   const data = await prisma.user.findMany({});
@@ -20,9 +16,11 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 };
 
-const Users = (props: Props) => {
-  const [users, setUsers] = useState<UserProps[]>(props.users);
+type Props = {
+  users: UserProps[];
+};
 
+const Users = ({ users }: Props) => {
   return (
     <Layout>
       <main>
@@ -36,7 +34,7 @@ const Users = (props: Props) => {
         </div>
         <h1>User一覧</h1>
         <hr />
-        {props.users.map((user) => (
+        {users.map((user) => (
           <div key={`${user.id}`}>
             <User user={user} />
           </div>

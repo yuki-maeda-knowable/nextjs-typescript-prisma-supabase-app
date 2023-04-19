@@ -1,23 +1,21 @@
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { Stack, TextField } from "@mui/material";
+import { PostSearchForm } from "../../types/interface";
 
-interface SearchInput {
-  title: string;
-}
 const PostSearchForm = () => {
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SearchInput>({
+  } = useForm<PostSearchForm>({
     defaultValues: {
       title: "",
     },
   });
 
-  const handleSearch = (input: SearchInput) => {
+  const handleSearch = (input: PostSearchForm) => {
     const { title } = input;
     router.push({
       pathname: "/",
