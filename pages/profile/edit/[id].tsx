@@ -3,13 +3,14 @@ import React from "react";
 import getProfile from "../../../lib/getProfile";
 import { getSession } from "next-auth/react";
 import { GetServerSidePropsContext } from "next";
-import { Profile } from "../../../components/profile/profileForm";
+// import { Profile } from "../../../components/profile/profileForm";
+import { ProfileProps } from "../../../types/interface";
 import ProfileForm from "../../../components/profile/profileForm";
 import { useRouter } from "next/router";
 import { Box, Typography } from "@mui/material";
 import Layout from "../../../components/Layout";
 type EditProfile = {
-  profile?: Profile;
+  profile?: ProfileProps;
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
