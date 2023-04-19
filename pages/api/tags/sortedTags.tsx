@@ -8,6 +8,7 @@ export default async function handler(
   //Getだったら、使用回数の多いタグ名を10件返す
   if (req.method === "GET") {
     try {
+      // dataには、tagsIdとそのtagsIdが紐づく投稿の数が入っている
       const data = await prisma.postTags.groupBy({
         by: ["tagsId"],
         _count: {

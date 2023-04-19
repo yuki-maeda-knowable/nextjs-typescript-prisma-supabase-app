@@ -17,9 +17,13 @@ import FavoriteButton from "../../components/FavoriteButton";
 import { Share } from "@mui/icons-material";
 import useCurrentUser from "../../hooks/useCurrentUser";
 import { useState } from "react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { TagPostProps } from "../../types/interface";
 
 //getServerSidePropsでタグに紐づく投稿を取得する。型も定義しながら
-export const getServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const { id } = context.query;
 
   //prismaでタグに紐づく投稿を降順で取得する
@@ -45,16 +49,14 @@ export const getServerSideProps = async (context) => {
     },
   });
 
-  const posts = JSON.parse(JSON.stringify(data));
+  const tagPosts = JSON.parse(JSON.stringify(data));
   return {
-    props: { posts },
+    props: { tagPosts },
   };
 };
 
-const TagsPosts = (props) => {
-  const { posts } = props;
-
-  const post = posts[0]?.PostTags;
+const TagsPosts = ({ tagPosts }: { tagPosts: TagPostProps }) => {
+  const posts = tagPosts[0]?.PostTags;
 
   const { data: user } = useCurrentUser();
 
@@ -66,19 +68,20 @@ const TagsPosts = (props) => {
   //1ページ目の最後に表示させる添字
   const endOffset = itemsOffset + itemsPerPage;
   //現在のページに表示させる要素数
-  const currentPosts = post?.slice(itemsOffset, endOffset);
+  const currentPosts = posts?.slice(itemsOffset, endOffset);
   //ページの数。postsの全体数を1ページあたりに表示する数でmath.ceilを使って切り上げる
-  const pageCount = Math.ceil(posts?.length / itemsPerPage);
+  const pageCount = Math.ceil(tagPosts[0]?.PostTags.length / itemsPerPage);
 
   //現在のページを管理するstate
   const [currentPage, setCurrentPage] = useState(1);
   const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
+    e: React.ChangeEvent<unknown>,
     pageIndex: number
   ) => {
     setCurrentPage(pageIndex);
     const selectedPage = pageIndex - 1;
-    const newOffset = (selectedPage * itemsPerPage) % posts?.length;
+    const newOffset =
+      (selectedPage * itemsPerPage) % tagPosts[0]?.PostTags.length;
     setItemsOffset(newOffset);
   };
   // ---- pagination end ------------
@@ -96,7 +99,7 @@ const TagsPosts = (props) => {
   // ---- post delete end ------------
 
   //もしタグに紐づく投稿がなければ、タグに紐づく記事はないと表示
-  if (post?.length === 0) {
+  if (posts?.length === 0) {
     return (
       <Layout>
         <Box color={"text.primary"}>
@@ -114,16 +117,6 @@ const TagsPosts = (props) => {
         <Box color={"text.primary"}>
           <Typography>タグに紐づく投稿一覧</Typography>
         </Box>
-        {/* <Box>
-          {post.map((p) => (
-            <Box key={p.id}>
-              <Link href={`/p/${p.Post.id}`}>
-                <Typography>{p.Post.title}</Typography>
-              </Link>
-            </Box>
-          ))}
-        </Box> */}
-
         <Box>
           {currentPosts?.map((post) => (
             <Card
