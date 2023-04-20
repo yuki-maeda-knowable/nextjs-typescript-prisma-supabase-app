@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const userId = session?.user?.id;
-  const profile = await getProfile(userId);
+  const profile = await getProfile(userId ? userId : "");
   return {
     props: { profile },
   };

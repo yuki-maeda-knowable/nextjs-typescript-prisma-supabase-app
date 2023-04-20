@@ -7,6 +7,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { ChangeEvent } from "react";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import GoogleIcon from "@mui/icons-material/Google";
 
 const Signin: NextPage = () => {
   const router = useRouter();
@@ -122,13 +124,25 @@ const Signin: NextPage = () => {
                 {variant === "register" ? "register" : "Login"}
               </Button>
               <Button
-                onClick={toggleVariant}
+                onClick={() => signIn("google", { callbackUrl: "/" })}
                 variant="text"
-                sx={{ ":hover": { opacity: "0.8" } }}
               >
-                {variant === "register" ? "ログインはこっち" : "登録はこっち"}
+                <GoogleIcon />
+              </Button>
+              <Button
+                onClick={() => signIn("github", { callbackUrl: "/" })}
+                variant="text"
+              >
+                <GitHubIcon />
               </Button>
             </Box>
+            <Button
+              onClick={toggleVariant}
+              variant="text"
+              sx={{ ":hover": { opacity: "0.8" } }}
+            >
+              {variant === "register" ? "ログインはこっち" : "登録はこっち"}
+            </Button>
           </Stack>
         </Box>
       </Box>

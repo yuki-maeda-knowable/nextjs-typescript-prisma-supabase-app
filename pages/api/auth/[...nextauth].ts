@@ -1,8 +1,10 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import prisma from "../../../lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 export const authOptions: NextAuthOptions = {
   //signinのページは作成したフォームを使用する
@@ -15,6 +17,11 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
+    }),
+    // googleProviderの追加
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
     CredentialsProvider({
       // メールでログインする時とかに表示させる文言
@@ -72,18 +79,15 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      session.user.id = token.id;
-      return session;
-    },
+  // OAuth認証の場合は、adapterを指定して、DBに保存する
+  adapter: PrismaAdapter(prisma),
+  // sessionの設定。OAuthを利用する場合は、以下を追加する必要がある。
+  // credentialsのみを利用する場合は、以下は不要。併用するなら必要
+  session: {
+    // strategyは、どの認証方法を使用するかを指定する
+    strategy: "jwt",
   },
+  callbacks: {},
 };
 
 export default NextAuth(authOptions);

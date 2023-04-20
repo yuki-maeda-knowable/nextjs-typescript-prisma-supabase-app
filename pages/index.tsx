@@ -26,7 +26,6 @@ import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { useEffect } from "react";
-import useTags from "../hooks/useTags";
 import useSortedTags from "../hooks/useSortedTags";
 type Props = {
   feed: PostProps[];
@@ -46,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const profile = await getProfile(session?.user?.id);
+  const profile = await getProfile(session?.user?.id ? session?.user?.id : "");
   const { keyword } = context.query;
   if (keyword) {
     // 検索ワードが配列になっちゃうから、一旦文字列に変換
@@ -89,8 +88,6 @@ const Blog = (props: Props) => {
   const { data: currentUser } = useCurrentUser();
   const { data: posts, mutate: mutatePosts, error } = usePost();
 
-  //tagの一覧を取得
-  const { data: tags, mutate: mutateTags } = useTags();
   const { data: sortedTags, mutate: mutateSortedTags } = useSortedTags();
 
   // postsに変更があったら再レンダリング
