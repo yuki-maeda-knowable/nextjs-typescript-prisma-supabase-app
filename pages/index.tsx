@@ -28,6 +28,7 @@ import usePost from "../hooks/usePost";
 import { useEffect } from "react";
 import useSortedTags from "../hooks/useSortedTags";
 import useUsers from "../hooks/useUsers";
+import useFollowingCount from "../hooks/useFollowingCount";
 type Props = {
   feed: PostProps[];
   keyword: string;
@@ -91,6 +92,9 @@ const Blog = (props: Props) => {
 
   const { data: sortedTags, mutate: mutateSortedTags } = useSortedTags();
 
+  // followしている人の数を取得
+  const { data: following, mutate: mutateFollowingCount } = useFollowingCount();
+
   // ---- get all users start ------------
 
   const { data: users, mutate: mutateUsers } = useUsers();
@@ -103,6 +107,7 @@ const Blog = (props: Props) => {
     // mutateTags();
     mutateSortedTags();
     mutateUsers();
+    mutateFollowingCount();
   }, [posts, sortedTags, users]);
 
   // ---- pagination start ------------
@@ -169,7 +174,7 @@ const Blog = (props: Props) => {
           <Box display={"flex"} flexDirection={"column"}>
             <Typography color="whitesmoke" variant="h6">
               <Link href={`/following`}>
-                <a>following</a>
+                <a>{following?.followingCount} following</a>
               </Link>
             </Typography>
             <Typography color="whitesmoke" variant="h6">

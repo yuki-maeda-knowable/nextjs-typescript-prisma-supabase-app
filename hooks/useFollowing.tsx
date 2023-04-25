@@ -7,6 +7,7 @@ export default function useFollowing(id: string) {
     followingUsers: data?.followingUsers,
     followingPosts: data?.followingPosts,
     error,
-    mutate,
+    followingPostsMutate: mutate,
+    followingUsersMutate: mutate,
   };
 }

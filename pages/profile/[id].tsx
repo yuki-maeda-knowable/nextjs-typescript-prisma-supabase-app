@@ -41,7 +41,7 @@ export async function getServerSideProps(context) {
   const { id } = context.query;
   const profile = await getProfile(id);
   return {
-    props: { profile },
+    props: { profile, id },
   };
 }
 

@@ -9,7 +9,6 @@ import {
   CardContent,
   CardActions,
   IconButton,
-  Button,
 } from "@mui/material";
 import useFollower from "../../hooks/useFollowing";
 import { GetServerSideProps } from "next";
@@ -18,6 +17,8 @@ import useCurrentUser from "../../hooks/useCurrentUser";
 import Link from "next/link";
 import FavoriteButton from "../../components/FavoriteButton";
 import { Share } from "@mui/icons-material";
+import useFollowingCount from "../../hooks/useFollowingCount";
+import { useEffect } from "react";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -36,11 +37,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Following = () => {
-  const { data: currentUser } = useCurrentUser();
-  const { followingUsers, followingPosts, error, mutate } = useFollower(
-    currentUser?.id
-  );
+  const { data: currentUser, mutate: mutateFollowingCount } = useCurrentUser();
+  const {
+    followingUsers,
+    followingPosts,
+    error,
+    followingPostsMutate: mutateFollowingPosts,
+    followingUsersMutate: mutateFollowingUsers,
+  } = useFollower(currentUser?.id);
 
+  const { data } = useFollowingCount();
+  useEffect(() => {
+    mutateFollowingPosts();
+    mutateFollowingUsers();
+    mutateFollowingCount();
+  }, [
+    followingUsers,
+    followingPosts,
+    mutateFollowingPosts,
+    mutateFollowingUsers,
+  ]);
   if (!followingUsers || !followingPosts) {
     return (
       <Layout>
@@ -114,7 +130,9 @@ const Following = () => {
 
           {followingUsers?.length !== 0 ? (
             <Box width={"40%"} m={1}>
-              <Typography variant="h6">following user</Typography>
+              <Typography variant="h6">
+                {data?.followingCount} following user
+              </Typography>
               {followingUsers?.map((followingUser) => (
                 <Link
                   href={`/profile/${followingUser.id}`}
