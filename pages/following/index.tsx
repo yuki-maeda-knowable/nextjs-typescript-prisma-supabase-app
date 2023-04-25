@@ -10,6 +10,7 @@ import {
   CardActions,
   IconButton,
 } from "@mui/material";
+import format from "date-fns/format";
 import useFollower from "../../hooks/useFollowing";
 import { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
@@ -90,7 +91,8 @@ const Following = () => {
                             src={followingPost?.author?.image}
                           ></Avatar>
                         }
-                        title={followingPost.title}
+                        subheader={followingPost.title}
+                        title={followingPost?.author?.name}
                       />
                       <Link href={`/p/${followingPost.id}`}>
                         <CardContent
@@ -116,6 +118,18 @@ const Following = () => {
                         <IconButton aria-label="share">
                           <Share />
                         </IconButton>
+                        <Typography
+                          variant="body1"
+                          color="text.primary"
+                          sx={{
+                            fontSize: "0.8rem",
+                          }}
+                        >
+                          {format(
+                            new Date(followingPost.createdAt),
+                            "yyyy/MM/dd HH:mm"
+                          )}
+                        </Typography>
                       </CardActions>
                     </Card>
                   </Grid>

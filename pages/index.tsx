@@ -5,6 +5,7 @@ import { PostProps } from "../types/interface";
 import prisma from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
+import format from "date-fns/format";
 import {
   Avatar,
   Card,
@@ -227,7 +228,8 @@ const Blog = (props: Props) => {
                           src={post?.author?.image}
                         ></Avatar>
                       }
-                      title={post.title}
+                      title={post?.author?.name}
+                      subheader={post.title}
                     />
                     <Link href={`/p/${post.id}`}>
                       <CardContent
@@ -263,6 +265,15 @@ const Blog = (props: Props) => {
                           削除
                         </Button>
                       )}
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        sx={{
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        {format(new Date(post?.createdAt), "yyyy/MM/dd HH:mm")}
+                      </Typography>
                     </CardActions>
                   </Card>
                 </Grid>
