@@ -165,6 +165,20 @@ const Blog = (props: Props) => {
               {posts?.length ? posts?.length : 0} Posts
             </Typography>
           </Box>
+          {/* followしてる人の一覧のリンク */}
+          <Box display={"flex"} flexDirection={"column"}>
+            <Typography color="whitesmoke" variant="h6">
+              <Link href={`/following`}>
+                <a>following</a>
+              </Link>
+            </Typography>
+            <Typography color="whitesmoke" variant="h6">
+              <Link href={`/follower`}>
+                <a>follower</a>
+              </Link>
+            </Typography>
+          </Box>
+
           <Box sx={{ display: "flex", flexDirection: "column", width: "30%" }}>
             <Typography color="whitesmoke" variant="h6">
               <Link href={`/profile/${currentUser?.id}`}>
@@ -272,7 +286,7 @@ const Blog = (props: Props) => {
             {users?.map(
               (user) =>
                 user.id !== currentUser?.id && (
-                  <Link href={`/profile/${user.id}`}>
+                  <Link href={`/profile/${user.id}`} key={user.id}>
                     <Box
                       display={"flex"}
                       p={1}
