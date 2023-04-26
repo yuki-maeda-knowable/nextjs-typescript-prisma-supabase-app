@@ -80,3 +80,8 @@ export interface TagProps {
 export interface TagPostProps {
   tagPosts: [];
 }
+
+// followボタンの型定義
+export interface FollowButtonProps {
+  followerId: string;
+}

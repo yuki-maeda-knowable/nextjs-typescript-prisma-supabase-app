@@ -20,4 +20,10 @@ export default async function handler(
     });
     return res.status(200).json(data);
   }
+
+  // getメソッドだったら、全ユーザー情報を返す
+  if (req.method === "GET") {
+    const data = await prisma.user.findMany();
+    return res.status(200).json(data);
+  }
 }

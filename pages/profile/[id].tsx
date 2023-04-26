@@ -18,6 +18,8 @@ import "@splidejs/react-splide/css";
 import { Options } from "@splidejs/splide";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import useCurrentUser from "../../hooks/useCurrentUser";
+import FollowButton from "../../components/FollowButton";
 
 interface profile {
   nickname: string;
@@ -39,16 +41,25 @@ export async function getServerSideProps(context) {
   const { id } = context.query;
   const profile = await getProfile(id);
   return {
-    props: { profile },
+    props: { profile, id },
   };
 }
 
 const Profile = (props) => {
+  // loadingの状態管理
+  const [loading, setLoading] = useState(true);
+  const [variant, setVariant] = useState("register");
+  const { data: currentUser } = useCurrentUser();
+
   useEffect(() => {
+    // currentUserが読み込まれたらloadingをfalseにする
+    if (currentUser) {
+      setLoading(false);
+    }
     if (props.profile.id) {
       setVariant("update");
     }
-  }, []);
+  }, [currentUser, props]);
 
   const thumbsOptions: Options = {
     type: "loop",
@@ -63,7 +74,10 @@ const Profile = (props) => {
     autoplay: true,
     interval: 3000,
   };
-  const [variant, setVariant] = useState("register");
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <Layout>
@@ -74,7 +88,8 @@ const Profile = (props) => {
 
         <Stack component="form" alignItems="center">
           <Card sx={{ width: 300, p: 3 }}>
-            {!props?.profile?.Photo ? (
+            {props?.profile?.Photo.length === 0 ||
+            !props?.profile?.photo === undefined ? (
               <CardMedia
                 component="img"
                 height="300"
@@ -132,9 +147,23 @@ const Profile = (props) => {
             <CardActions>
               <Button size="small">Share</Button>
               <Button size="small">Learn More</Button>
-              <Button size="small" href={`/profile/`}>
-                {variant === "register" ? "profile作成" : "profile編集"}
-              </Button>
+              {/* 自分以外には非表示にする */}
+              {props.profile.userId === currentUser?.id && (
+                <Button size="small" href={`/profile/`}>
+                  {variant === "register" ? "profile作成" : "profile編集"}
+                </Button>
+              )}
+              {props?.profile?.userId === undefined && (
+                <Button size="small" href={`/profile/`}>
+                  {variant === "register" ? "profile作成" : "profile編集"}
+                </Button>
+              )}
+
+              {/* 自分以外だったらフォローボタンを表示 */}
+              {props?.profile?.userId !== currentUser?.id &&
+                props?.profile?.userId && (
+                  <FollowButton followerId={props?.id} />
+                )}
               {/* <Button
                 href={`/profile/edit/${props?.profile?.userId}/`}
                 size="small"

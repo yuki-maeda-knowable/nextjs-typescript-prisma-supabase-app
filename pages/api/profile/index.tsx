@@ -11,7 +11,7 @@ export default async function handler(
       const profile = await prisma.profile.create({
         data: {
           nickname: nickname,
-          gender: gender,
+          gender: Number(gender),
           birthday: new Date(birthday),
           userId: userId,
         },
@@ -31,6 +31,7 @@ export default async function handler(
 
       return res.status(200).json({ profile, photo });
     } catch (error) {
+      console.log(error);
       return res.status(401).json(error);
     }
   }

@@ -36,6 +36,8 @@ model User {
   profile       Profile?
   favorites     Favorites[]
   comments      Comments[]
+  follower      Follows[]   @relation("follower")
+  following     Follows[]   @relation("following")
 
   @@map(name: "users")
 }
@@ -130,4 +132,15 @@ model PostTags {
   postId String
   Tags   Tags   @relation(fields: [tagsId], references: [id], onDelete: Cascade)
   tagsId String
+}
+
+// followsテーブルを作成
+model Follows {
+  id          String    @id @default(cuid())
+  follower    User      @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   User      @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  @@unique([followerId, followingId])
 }

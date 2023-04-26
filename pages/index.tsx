@@ -5,6 +5,7 @@ import { PostProps } from "../types/interface";
 import prisma from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
+import format from "date-fns/format";
 import {
   Avatar,
   Card,
@@ -27,6 +28,9 @@ import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
 import { useEffect } from "react";
 import useSortedTags from "../hooks/useSortedTags";
+import useUsers from "../hooks/useUsers";
+import useFollowingCount from "../hooks/useFollowingCount";
+import useFollower from "../hooks/useFollower";
 type Props = {
   feed: PostProps[];
   keyword: string;
@@ -90,12 +94,26 @@ const Blog = (props: Props) => {
 
   const { data: sortedTags, mutate: mutateSortedTags } = useSortedTags();
 
-  // postsに変更があったら再レンダリング
+  // followしている人の数を取得
+  const { data: following, mutate: mutateFollowingCount } = useFollowingCount();
+  //followerの数を取得
+  const { data: follower, mutate: mutateFollower } = useFollower();
+
+  // ---- get all users start ------------
+
+  const { data: users, mutate: mutateUsers } = useUsers();
+
+  // ---- get all users end ------------
+
+  // posts, tag, usersに変更があったら再レンダリング
   useEffect(() => {
     mutatePosts();
     // mutateTags();
     mutateSortedTags();
-  }, [posts, sortedTags]);
+    mutateUsers();
+    mutateFollowingCount();
+    mutateFollower();
+  }, [posts, sortedTags, users]);
 
   // ---- pagination start ------------
   // 1ページに表示する記事数
@@ -157,6 +175,23 @@ const Blog = (props: Props) => {
               {posts?.length ? posts?.length : 0} Posts
             </Typography>
           </Box>
+          {/* followしてる人の一覧のリンク */}
+          <Box display={"flex"} flexDirection={"column"}>
+            <Typography color="whitesmoke" variant="h6">
+              <Link href={`/following`}>
+                <a>{following?.followingCount} following</a>
+              </Link>
+            </Typography>
+            <Typography color="whitesmoke" variant="h6">
+              <Link href={`/follower`}>
+                <a>
+                  {follower?.length === 0 || undefined ? 0 : follower?.length}{" "}
+                  follower
+                </a>
+              </Link>
+            </Typography>
+          </Box>
+
           <Box sx={{ display: "flex", flexDirection: "column", width: "30%" }}>
             <Typography color="whitesmoke" variant="h6">
               <Link href={`/profile/${currentUser?.id}`}>
@@ -186,76 +221,110 @@ const Blog = (props: Props) => {
             </Box>
           </Box>
         </Box>
-        <Box width={"100%"}>
-          <Grid container spacing={2}>
-            {currentPosts?.map((post) => (
-              <Grid item xs={12} sm={6} md={4} key={post.id}>
-                <Card sx={{ margin: 1, ":hover": { opacity: "0.8" } }}>
-                  <CardHeader
-                    avatar={
-                      <Avatar
-                        sx={{ bgcolor: "white" }}
-                        aria-label="recipe"
-                        src={post?.author?.image}
-                      ></Avatar>
-                    }
-                    title={post.title}
-                  />
-                  <Link href={`/p/${post.id}`}>
-                    <CardContent
-                      sx={{
-                        cursor: "pointer",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        height: "100px",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        color="text.primary"
-                        whiteSpace={"pre-wrap"}
-                      >
-                        {post.content}
-                      </Typography>
-                    </CardContent>
-                  </Link>
-                  <CardActions disableSpacing>
-                    <FavoriteButton postId={post.id} />
-                    <IconButton aria-label="share">
-                      <Share />
-                    </IconButton>
-                    {/* 投稿者とログインユーザが同じなら表示 */}
-                    {currentUser?.id === post?.authorId && (
-                      <Button
-                        onClick={() => {
-                          handleDeletePost(post.id);
+        <Box display={"flex"}>
+          <Box>
+            <Grid container spacing={2}>
+              {currentPosts?.map((post) => (
+                <Grid item xs={12} sm={6} md={4} key={post.id}>
+                  <Card sx={{ margin: 1, ":hover": { opacity: "0.8" } }}>
+                    <CardHeader
+                      avatar={
+                        <Avatar
+                          sx={{ bgcolor: "white" }}
+                          aria-label="recipe"
+                          src={post?.author?.image}
+                        ></Avatar>
+                      }
+                      title={post?.author?.name}
+                      subheader={post.title}
+                    />
+                    <Link href={`/p/${post.id}`}>
+                      <CardContent
+                        sx={{
+                          cursor: "pointer",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          height: "100px",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        削除
-                      </Button>
-                    )}
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                        <Typography
+                          variant="body2"
+                          color="text.primary"
+                          whiteSpace={"pre-wrap"}
+                        >
+                          {post.content}
+                        </Typography>
+                      </CardContent>
+                    </Link>
+                    <CardActions disableSpacing>
+                      <FavoriteButton postId={post.id} />
+                      <IconButton aria-label="share">
+                        <Share />
+                      </IconButton>
+                      {/* 投稿者とログインユーザが同じなら表示 */}
+                      {currentUser?.id === post?.authorId && (
+                        <Button
+                          onClick={() => {
+                            handleDeletePost(post.id);
+                          }}
+                        >
+                          削除
+                        </Button>
+                      )}
+                      <Typography
+                        variant="body1"
+                        color="text.primary"
+                        sx={{
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        {format(new Date(post?.createdAt), "yyyy/MM/dd HH:mm")}
+                      </Typography>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            <Box
+              color={"text.primary"}
+              textAlign={"center"}
+              display={"flex"}
+              justifyContent={"center"}
+              mt={2}
+            >
+              <Pagination
+                count={pageCount}
+                onChange={handlePageChange}
+                color="primary"
+                page={currentPage}
+              />
+            </Box>
+            <PostAdd />
+          </Box>
+          <Box width={"20%"} color={"text.primary"}>
+            <Typography variant="h6" pl={1} pt={1}>
+              Users
+            </Typography>
+            {users?.map(
+              (user) =>
+                user.id !== currentUser?.id && (
+                  <Link href={`/profile/${user.id}`} key={user.id}>
+                    <Box
+                      display={"flex"}
+                      p={1}
+                      sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+                    >
+                      <Avatar alt="user-image" src={user.image} />
+                      <Typography pl={1} pt={1}>
+                        {user.name}
+                      </Typography>
+                    </Box>
+                  </Link>
+                )
+            )}
+          </Box>
         </Box>
-        <Box
-          color={"text.primary"}
-          textAlign={"center"}
-          display={"flex"}
-          justifyContent={"center"}
-          mt={2}
-        >
-          <Pagination
-            count={pageCount}
-            onChange={handlePageChange}
-            color="primary"
-            page={currentPage}
-          />
-        </Box>
-        <PostAdd />
       </Box>
     </Layout>
   );
