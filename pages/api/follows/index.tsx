@@ -17,8 +17,12 @@ export default async function handler(
   // get通信だったら、followテーブルの情報を返す
   if (req.method === "GET") {
     try {
-      //認証が通ったら、followsテーブルの情報を取得する
-      const follows = await prisma.follows.findMany({});
+      //認証が通ったら、followsテーブルの中からログインユーザがフォローしているユーザー情報を取得する
+      const follows = await prisma.follows.findMany({
+        where: {
+          followingId: currentUser?.id,
+        },
+      });
       return res.status(200).json(follows);
     } catch (error) {
       console.log(error);

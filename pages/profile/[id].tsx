@@ -46,11 +46,20 @@ export async function getServerSideProps(context) {
 }
 
 const Profile = (props) => {
+  // loadingの状態管理
+  const [loading, setLoading] = useState(true);
+  const [variant, setVariant] = useState("register");
+  const { data: currentUser } = useCurrentUser();
+
   useEffect(() => {
+    // currentUserが読み込まれたらloadingをfalseにする
+    if (currentUser) {
+      setLoading(false);
+    }
     if (props.profile.id) {
       setVariant("update");
     }
-  }, []);
+  }, [currentUser, props]);
 
   const thumbsOptions: Options = {
     type: "loop",
@@ -65,8 +74,10 @@ const Profile = (props) => {
     autoplay: true,
     interval: 3000,
   };
-  const [variant, setVariant] = useState("register");
-  const { data: currentUser } = useCurrentUser();
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <Layout>
@@ -77,7 +88,8 @@ const Profile = (props) => {
 
         <Stack component="form" alignItems="center">
           <Card sx={{ width: 300, p: 3 }}>
-            {!props?.profile?.Photo ? (
+            {props?.profile?.Photo.length === 0 ||
+            !props?.profile?.photo === undefined ? (
               <CardMedia
                 component="img"
                 height="300"
@@ -141,10 +153,17 @@ const Profile = (props) => {
                   {variant === "register" ? "profile作成" : "profile編集"}
                 </Button>
               )}
-              {/* 自分以外だったらフォローボタンを表示 */}
-              {props.profile.userId !== currentUser?.id && (
-                <FollowButton followerId={props?.id} />
+              {props?.profile?.userId === undefined && (
+                <Button size="small" href={`/profile/`}>
+                  {variant === "register" ? "profile作成" : "profile編集"}
+                </Button>
               )}
+
+              {/* 自分以外だったらフォローボタンを表示 */}
+              {props?.profile?.userId !== currentUser?.id &&
+                props?.profile?.userId && (
+                  <FollowButton followerId={props?.id} />
+                )}
               {/* <Button
                 href={`/profile/edit/${props?.profile?.userId}/`}
                 size="small"
