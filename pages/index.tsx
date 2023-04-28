@@ -161,34 +161,36 @@ const Blog = (props: Props) => {
 
   return (
     <Layout>
-      <Box sx={{ margin: 2, width: "100%", height: "100%" }}>
+      <Box
+        sx={{ margin: 2, width: "100%", height: "100%", color: "text.primary" }}
+      >
         <Box
           display={"flex"}
           justifyContent={"space-between"}
           color={"text.primary"}
         >
           <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="h5" sx={{ color: "whitesmoke" }}>
-              Public Feed
-            </Typography>
-            <Typography color="whitesmoke" variant="h6">
+            <Typography variant="h5">Public Feed</Typography>
+            <Typography variant="h6">
               {posts?.length ? posts?.length : 0} Posts
             </Typography>
           </Box>
-          {/* followしてる人の一覧のリンク */}
           <Box display={"flex"} flexDirection={"column"}>
-            <Typography color="whitesmoke" variant="h6">
+            <Typography variant="h6">
               <Link href={`/following`}>
                 <a>{following?.followingCount} following</a>
               </Link>
             </Typography>
-            <Typography color="whitesmoke" variant="h6">
+            <Typography variant="h6">
               <Link href={`/follower`}>
                 <a>
                   {follower?.length === 0 || undefined ? 0 : follower?.length}{" "}
                   follower
                 </a>
               </Link>
+            </Typography>
+            <Typography variant="h6">
+              <Link href={`/matches`}>matching Users</Link>
             </Typography>
           </Box>
 
