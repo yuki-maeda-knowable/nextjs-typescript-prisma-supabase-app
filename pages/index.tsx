@@ -150,9 +150,11 @@ const Blog = (props: Props) => {
           color={"text.primary"}
         >
           <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="h5">Public Feed</Typography>
-            <Typography variant="h6">
-              {posts?.length ? posts?.length : 0} Posts
+            <Typography variant="h5" sx={{ color: "whitesmoke" }}>
+              Public Feed
+            </Typography>
+            <Typography color="whitesmoke" variant="h6">
+              {searchQuery?.length ? searchQuery?.length : 0} Posts
             </Typography>
 
             <PostSearchForm
