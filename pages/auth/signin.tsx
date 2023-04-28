@@ -49,6 +49,18 @@ const Signin: NextPage = () => {
         body: JSON.stringify({ name, email, password }),
       });
       const data = await res.json();
+
+      const resMail = await fetch("/api/mail/useradd", {
+        method: "POST",
+        body: JSON.stringify({
+          name: name,
+          email: email,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       login();
     } catch (error) {
       console.error(error);
