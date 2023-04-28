@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { GetServerSideProps } from "next";
+import React, { useState, useEffect, useRef } from "react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import Layout from "../components/Layout";
 import { PostProps } from "../types/interface";
-import prisma from "../lib/prisma";
 import { getSession } from "next-auth/react";
 import PostAdd from "./p/PostAdd";
 import format from "date-fns/format";
+import PostSearchForm from "../components/post/postSearchForm";
 import {
   Avatar,
   Card,
@@ -19,25 +19,28 @@ import {
   Pagination,
   Chip,
   Grid,
+  TextField,
 } from "@mui/material";
-import { Share } from "@mui/icons-material";
 import getProfile from "../lib/getProfile";
 import Link from "next/link";
 import useCurrentUser from "../hooks/useCurrentUser";
 import FavoriteButton from "../components/FavoriteButton";
 import usePost from "../hooks/usePost";
-import { useEffect } from "react";
 import useSortedTags from "../hooks/useSortedTags";
 import useUsers from "../hooks/useUsers";
 import useFollowingCount from "../hooks/useFollowingCount";
 import useFollower from "../hooks/useFollower";
+import Loading from "./loading";
+import { Share } from "@mui/icons-material";
+
 type Props = {
-  feed: PostProps[];
-  keyword: string;
+  posts: PostProps[];
   profile: any;
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getSession(context);
 
   if (!session) {
@@ -50,47 +53,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const profile = await getProfile(session?.user?.id ? session?.user?.id : "");
-  const { keyword } = context.query;
-  if (keyword) {
-    // 検索ワードが配列になっちゃうから、一旦文字列に変換
-    const keywordString: string = Array.isArray(keyword) ? keyword[0] : keyword;
-    const feed = await prisma.post.findMany({
-      where: {
-        published: true,
-        title: {
-          contains: keywordString,
-        },
-      },
-      include: {
-        author: {
-          select: { name: true, image: true },
-        },
-      },
-    });
-    return {
-      props: { feed, profile },
-    };
-  } else {
-    const data = await prisma.post.findMany({
-      where: {
-        published: true,
-      },
-      include: {
-        author: {
-          select: { name: true, image: true },
-        },
-      },
-    });
-    const feed = JSON.parse(JSON.stringify(data));
-    return {
-      props: { feed, profile },
-    };
-  }
+  return {
+    props: { profile },
+  };
 };
 
 const Blog = (props: Props) => {
+  // loadingの状態を管理
+  const [open, setOpen] = useState(true);
   const { data: currentUser } = useCurrentUser();
   const { data: posts, mutate: mutatePosts, error } = usePost();
+
+  // 検索後の記事を格納する配列
+  const [searchQuery, setSearchQuery] = useState([]);
+  const ref = useRef(null);
+
+  const handleSearch = () => {
+    setSearchQuery(
+      posts.filter((post) =>
+        post.title.toLowerCase().includes(ref.current.value)
+      )
+    );
+  };
 
   const { data: sortedTags, mutate: mutateSortedTags } = useSortedTags();
 
@@ -99,16 +83,15 @@ const Blog = (props: Props) => {
   //followerの数を取得
   const { data: follower, mutate: mutateFollower } = useFollower();
 
-  // ---- get all users start ------------
-
   const { data: users, mutate: mutateUsers } = useUsers();
-
-  // ---- get all users end ------------
 
   // posts, tag, usersに変更があったら再レンダリング
   useEffect(() => {
+    if (posts) {
+      setSearchQuery(posts);
+      setOpen(false);
+    }
     mutatePosts();
-    // mutateTags();
     mutateSortedTags();
     mutateUsers();
     mutateFollowingCount();
@@ -123,9 +106,9 @@ const Blog = (props: Props) => {
   //1ページ目の最後に表示させる添字
   const endOffset = itemsOffset + itemsPerPage;
   //現在のページに表示させる要素数
-  const currentPosts = posts?.slice(itemsOffset, endOffset);
+  const currentPosts = searchQuery?.slice(itemsOffset, endOffset);
   //ページの数。postsの全体数を1ページあたりに表示する数でmath.ceilを使って切り上げる
-  const pageCount = Math.ceil(posts?.length / itemsPerPage);
+  const pageCount = Math.ceil(searchQuery?.length / itemsPerPage);
 
   //現在のページを管理するstate
   const [currentPage, setCurrentPage] = useState(1);
@@ -135,7 +118,7 @@ const Blog = (props: Props) => {
   ) => {
     setCurrentPage(pageIndex);
     const selectedPage = pageIndex - 1;
-    const newOffset = (selectedPage * itemsPerPage) % posts?.length;
+    const newOffset = (selectedPage * itemsPerPage) % searchQuery?.length;
     setItemsOffset(newOffset);
   };
   // ---- pagination end ------------
@@ -151,12 +134,9 @@ const Blog = (props: Props) => {
   };
   // ---- post delete end ------------
 
+  // postsを取得できていない場合はローディングを表示
   if (!posts) {
-    return (
-      <div>
-        <h1>Loading...</h1>
-      </div>
-    );
+    return <Loading open={open} />;
   }
 
   return (
@@ -172,8 +152,16 @@ const Blog = (props: Props) => {
               Public Feed
             </Typography>
             <Typography color="whitesmoke" variant="h6">
-              {posts?.length ? posts?.length : 0} Posts
+              {searchQuery?.length ? searchQuery?.length : 0} Posts
             </Typography>
+
+            <PostSearchForm
+              id={"outlined-basic"}
+              type={"text"}
+              label={"Post Search"}
+              inputRef={ref}
+              onChange={handleSearch}
+            />
           </Box>
           {/* followしてる人の一覧のリンク */}
           <Box display={"flex"} flexDirection={"column"}>

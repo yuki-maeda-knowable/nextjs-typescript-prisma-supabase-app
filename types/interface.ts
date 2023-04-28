@@ -61,8 +61,12 @@ export interface CommentEditProps {
 }
 
 // 検索フォームの型定義
-export interface PostSearchForm {
-  title: string;
+export interface PostSearchProps {
+  id: string;
+  label: string;
+  type: string;
+  inputRef: React.MutableRefObject<HTMLInputElement>;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 // いいねのボタンの型定義

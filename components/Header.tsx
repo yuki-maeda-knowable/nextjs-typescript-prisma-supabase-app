@@ -15,7 +15,6 @@ import {
   Typography,
 } from "@mui/material";
 import styled from "@emotion/styled";
-import PostSearchForm from "./post/postSearchForm";
 import useCurrentUser from "../hooks/useCurrentUser";
 
 const Header: React.FC = () => {
@@ -54,12 +53,6 @@ const Header: React.FC = () => {
           >
             LOGO
           </Typography>
-          {/* {currentUser && (
-            <Search sx={{ display: { xs: "none", sm: "flex" } }}>
-              <PostSearchForm />
-            </Search>
-          )} */}
-
           {currentUser && (
             <Box sx={{ flexGrow: 1 }}>
               <Stack direction={"row"} justifyContent="flex-end">
