@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSession } from "next-auth/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import Loading from "../loading";
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
@@ -25,25 +26,28 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const Matches = () => {
-  // loadingの状態管理
-  const [loading, setLoading] = useState(true);
+  // loadingの状態を管理
+  const [open, setOpen] = useState(true);
   const { data: matchedUsers, mutate: mutateMatchedUsers } = useMatches();
-  console.log(matchedUsers);
 
   useEffect(() => {
     // dataがあれば、loadingをfalseにする
     if (matchedUsers) {
-      setLoading(false);
+      setOpen(false);
     }
     mutateMatchedUsers();
   }, [matchedUsers, mutateMatchedUsers]);
 
   // loading中は、ローディング画面を表示する
-  if (loading) {
+  if (!matchedUsers) {
+    return <Loading open={open} />;
+  }
+  // matchingUserがいなかったら、No matchingUserと表示する
+  if (matchedUsers?.length === 0) {
     return (
       <Layout>
         <Box color={"text.primary"}>
-          <Typography variant="h6">loading...</Typography>
+          <Typography variant="h6">No matchingUser</Typography>
         </Box>
       </Layout>
     );

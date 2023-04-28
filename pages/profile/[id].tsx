@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import useCurrentUser from "../../hooks/useCurrentUser";
 import FollowButton from "../../components/FollowButton";
+import Loading from "../loading";
 
 interface profile {
   nickname: string;
@@ -47,14 +48,14 @@ export async function getServerSideProps(context) {
 
 const Profile = (props) => {
   // loadingの状態管理
-  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(true);
   const [variant, setVariant] = useState("register");
   const { data: currentUser } = useCurrentUser();
 
   useEffect(() => {
     // currentUserが読み込まれたらloadingをfalseにする
     if (currentUser) {
-      setLoading(false);
+      setOpen(false);
     }
     if (props.profile.id) {
       setVariant("update");
@@ -75,8 +76,8 @@ const Profile = (props) => {
     interval: 3000,
   };
 
-  if (loading) {
-    return <div>loading...</div>;
+  if (!currentUser) {
+    return <Loading open={open} />;
   }
 
   return (
@@ -88,7 +89,7 @@ const Profile = (props) => {
 
         <Stack component="form" alignItems="center">
           <Card sx={{ width: 300, p: 3 }}>
-            {props?.profile?.Photo.length === 0 ||
+            {props?.profile?.Photo?.length === 0 ||
             !props?.profile?.photo === undefined ? (
               <CardMedia
                 component="img"
