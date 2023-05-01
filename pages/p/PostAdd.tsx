@@ -78,9 +78,7 @@ export default function PostAdd() {
     reset,
   } = useForm<PostProps>({
     defaultValues: {
-      title: "",
       content: "",
-      published: true,
     },
   });
 
@@ -88,12 +86,10 @@ export default function PostAdd() {
   const { data: posts, mutate: mutatePosts } = usePost();
 
   const submitPostRegister = async (input: PostProps) => {
-    const { title, content, published } = input;
+    const { content } = input;
 
     const postData = {
-      title: title,
       content: content,
-      published: published,
       tags: tags,
     };
 
@@ -165,17 +161,6 @@ export default function PostAdd() {
             onDelete={onDelete}
             onAddition={onAddition}
           />
-          <TextField
-            sx={{ width: 450, mt: 2, mb: 2 }}
-            {...register("title", { required: "入力必須" })}
-            label="title"
-            type="text"
-            variant="standard"
-            placeholder="title"
-          />
-          {errors.title && (
-            <span style={{ color: "red" }}>{errors.title?.message}</span>
-          )}
 
           <TextField
             sx={{ width: 450, mt: 2, mb: 2 }}

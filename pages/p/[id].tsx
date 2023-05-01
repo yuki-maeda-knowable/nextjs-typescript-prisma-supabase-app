@@ -69,9 +69,7 @@ const Post: React.FC<PostProps> = (post) => {
                 src={author?.image}
               />
             }
-            title={post.title}
           />
-          {post?.author?.name ? post.author.name : "Unknown author"}
           <CardContent>
             <Typography
               variant="body2"

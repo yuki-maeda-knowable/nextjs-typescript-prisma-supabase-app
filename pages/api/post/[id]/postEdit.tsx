@@ -14,7 +14,7 @@ export default async function handler(
   if (req.method === "PUT") {
     try {
       //req.bodyを取得
-      const { title, content } = req.body;
+      const { content } = req.body;
 
       //idを取得
       const postId = req.query.id;
@@ -25,7 +25,7 @@ export default async function handler(
       //idがあったら更新
       const post = await prisma.post.update({
         where: { id: String(postId) },
-        data: { title, content },
+        data: { content },
       });
       res.status(200).json(post);
     } catch (error) {

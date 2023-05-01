@@ -7,7 +7,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-    const { title, content, published, tags } = req.body;
+    const { content, tags } = req.body;
     // ログインしているユーザのsession情報を取得
     const session = await getSession({ req });
     const { email } = session.user;
@@ -16,9 +16,7 @@ export default async function handler(
     if (!tags || tags.length === 0) {
       const post = await prisma.post.create({
         data: {
-          title: title,
           content: content,
-          published: published,
           // 登録しているユーザでemailがログインしているユーザであるか
           author: {
             connect: {
@@ -58,9 +56,7 @@ export default async function handler(
       // tagsに紐づくpostを登録する
       const post = await prisma.post.create({
         data: {
-          title: title,
           content: content,
-          published: published,
           // 登録しているユーザでemailがログインしているユーザであるか
           author: {
             connect: {

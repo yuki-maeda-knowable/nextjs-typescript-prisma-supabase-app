@@ -4,7 +4,6 @@ import {
   Typography,
   Stack,
   Card,
-  CardMedia,
   CardContent,
   CardActions,
 } from "@mui/material";
@@ -52,6 +51,12 @@ const Profile = (props) => {
   const [variant, setVariant] = useState("register");
   const { data: currentUser } = useCurrentUser();
 
+  const genderMap = {
+    1: "男性",
+    2: "女性",
+    3: "その他",
+  };
+
   useEffect(() => {
     // currentUserが読み込まれたらloadingをfalseにする
     if (currentUser) {
@@ -67,8 +72,8 @@ const Profile = (props) => {
     rewind: true,
     gap: "1rem",
     pagination: true,
-    fixedWidth: 200,
-    fixedHeight: 200,
+    fixedWidth: 400,
+    fixedHeight: 400,
     cover: true,
     focus: "center",
     isNavigation: true,
@@ -83,28 +88,32 @@ const Profile = (props) => {
   return (
     <Layout>
       <Container maxWidth="lg">
-        <Typography variant="h6" color={`whitesmoke`}>
-          Profile
-        </Typography>
+        <Typography variant="h6">Profile</Typography>
 
         <Stack component="form" alignItems="center">
-          <Card sx={{ width: 300, p: 3 }}>
+          <Card sx={{ width: 600, p: 3 }}>
             {props?.profile?.Photo?.length === 0 ||
-            !props?.profile?.photo === undefined ? (
-              <CardMedia
-                component="img"
-                height="300"
-                image="https://pxrfjlomzjkqxocykntv.supabase.co/storage/v1/object/public/photos/user/670cad455cd14fdb8825-beach-2836300__340.jpeg"
-                alt="images"
-              />
+            props?.profile?.Photo === undefined ? (
+              <Splide aria-label="profile" options={thumbsOptions}>
+                <SplideSlide>
+                  <Image
+                    width={400}
+                    height={400}
+                    src={
+                      "https://pxrfjlomzjkqxocykntv.supabase.co/storage/v1/object/public/photos/user/profile/model_sora.jpeg"
+                    }
+                    alt="profile"
+                  />
+                </SplideSlide>
+              </Splide>
             ) : (
               <Splide aria-label="profile" options={thumbsOptions}>
                 {props?.profile?.Photo?.map((photo) => {
                   return (
                     <SplideSlide key={photo.id}>
                       <Image
-                        width={300}
-                        height={300}
+                        width={400}
+                        height={400}
                         key={photo.id}
                         src={photo.url}
                         alt="profile"
@@ -115,21 +124,22 @@ const Profile = (props) => {
               </Splide>
             )}
             <CardContent>
-              {!props.profile.nickname && (
-                <Typography gutterBottom variant="h5">
-                  noname
+              {!props.profile?.nickname && (
+                <Typography gutterBottom variant="h6">
+                  名前: 非公開
                 </Typography>
               )}
-              <Typography gutterBottom variant="h5">
-                {props.profile.nickname}
+              <Typography gutterBottom variant="h6">
+                名前: {props.profile.nickname}
               </Typography>
               {/* 年齢が未登録だったら */}
               {props.profile.birthday === "undefined" ? (
                 <Typography gutterBottom variant="h6">
-                  非公開
+                  年齢: 非公開
                 </Typography>
               ) : (
                 <Typography gutterBottom variant="h6">
+                  年齢:{" "}
                   {differenceInCalendarYears(
                     new Date(),
                     new Date(props.profile.birthday)
@@ -138,14 +148,12 @@ const Profile = (props) => {
                 </Typography>
               )}
               <Typography variant="body2" color="text.secondary">
-                {props.profile.gender !== 3
-                  ? props.profile.gender === 2
-                    ? "男性"
-                    : "女性"
-                  : "その他"}
+                {genderMap[props?.profile?.gender]}
               </Typography>
             </CardContent>
-            <CardActions>
+            <CardActions
+              sx={{ display: "flex", justifyContent: "space-between" }}
+            >
               <Button size="small">Share</Button>
               <Button size="small">Learn More</Button>
               {/* 自分以外には非表示にする */}
