@@ -3,11 +3,6 @@ import { useRouter } from "next/router";
 import Layout from "../Layout";
 import { Container, Typography, Stack, TextField, Button } from "@mui/material";
 import { PostProps } from "../../types/interface";
-// interface PostProps {
-//   title: string;
-//   content: string;
-//   published: boolean;
-// }
 
 export default function PostForm() {
   const router = useRouter();
@@ -17,18 +12,14 @@ export default function PostForm() {
     formState: { errors },
   } = useForm<PostProps>({
     defaultValues: {
-      title: "",
       content: "",
-      published: false,
     },
   });
 
   const submitPostRegister = async (input: PostProps) => {
-    const { title, content, published } = input;
+    const { content } = input;
     const postData = {
-      title: title,
       content: content,
-      published: published,
     };
 
     try {
@@ -62,17 +53,6 @@ export default function PostForm() {
           onSubmit={handleSubmit(submitPostRegister)}
           alignItems="center"
         >
-          <TextField
-            sx={{ width: 300, marginBottom: 2 }}
-            {...register("title", { required: "入力必須" })}
-            label="title"
-            type="text"
-            variant="standard"
-            placeholder="title"
-          />
-          {errors.title && (
-            <span style={{ color: "red" }}>{errors.title?.message}</span>
-          )}
           <TextField
             sx={{ width: 300, marginBottom: 2 }}
             {...register("content", { required: "入力必須" })}
