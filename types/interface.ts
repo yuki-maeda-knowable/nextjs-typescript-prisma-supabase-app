@@ -40,9 +40,7 @@ export interface SignInProps {
 //投稿フォームの型定義
 export interface PostProps {
   id?: string;
-  title: string;
   content: string;
-  published: boolean;
   authorId?: string;
   author: {
     name: string;

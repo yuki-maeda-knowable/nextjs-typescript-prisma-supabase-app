@@ -14,13 +14,11 @@ const PostEdit = () => {
   const { data: post } = usePostDetail(id as string);
 
   //入力された値をstateに保存
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
   //画面がレンダリングされたときに実行
   useEffect(() => {
     if (post) {
-      setTitle(post.title);
       setContent(post.content);
     }
   }, [post]);
@@ -32,7 +30,7 @@ const PostEdit = () => {
       const res = await fetch(`/api/post/${id}/postEdit`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ content }),
       });
 
       const data = await res.json();
@@ -58,18 +56,11 @@ const PostEdit = () => {
         }}
       >
         <Box
-          sx={{ display: "flex", border: "1px solid black" }}
+          sx={{ display: "flex", border: "1px solid black", pt: 5, pb: 5 }}
           justifyContent={"center"}
           width={500}
         >
           <Stack component="form" onSubmit={handlePostEdit}>
-            <UserInputForm
-              id="title"
-              label="title"
-              value={title}
-              type="text"
-              onChange={(e) => setTitle(e.target.value)}
-            />
             <UserInputForm
               id="content"
               label="content"
