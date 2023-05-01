@@ -11,7 +11,6 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader,
   IconButton,
   Typography,
   Box,
@@ -19,7 +18,7 @@ import {
   Pagination,
   Chip,
   Grid,
-  TextField,
+  CardMedia,
 } from "@mui/material";
 import getProfile from "../lib/getProfile";
 import Link from "next/link";
@@ -59,6 +58,9 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const Blog = (props: Props) => {
+  // 記事の最大表示文字数
+  const MAX_LENGTH = 20;
+
   // loadingの状態を管理
   const [open, setOpen] = useState(true);
   const { data: currentUser } = useCurrentUser();
@@ -164,35 +166,49 @@ const Blog = (props: Props) => {
             />
           </Box>
           <Box display={"flex"} flexDirection={"column"}>
-            <Typography variant="h6">
-              <Link href={`/following`}>
-                <a>{following?.followingCount} following</a>
-              </Link>
-            </Typography>
-            <Typography variant="h6">
-              <Link href={`/follower`}>
-                <a>
-                  {follower?.length === 0 || undefined ? 0 : follower?.length}{" "}
-                  follower
-                </a>
-              </Link>
-            </Typography>
-            <Typography variant="h6">
+            <Link href={`/following`}>
+              <Typography
+                variant="h6"
+                sx={{ cursor: "pointer", ":hover": { opacity: "0.8" } }}
+              >
+                {following?.followingCount} following
+              </Typography>
+            </Link>
+            <Link href={`/follower`}>
+              <Typography
+                variant="h6"
+                sx={{ cursor: "pointer", ":hover": { opacity: "0.8" } }}
+              >
+                {follower?.length === 0 || undefined ? 0 : follower?.length}{" "}
+                follower
+              </Typography>
+            </Link>
+            <Typography
+              variant="h6"
+              sx={{ cursor: "pointer", ":hover": { opacity: "0.8" } }}
+            >
               <Link href={`/matches`}>matching Users</Link>
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", width: "30%" }}>
-            <Typography color="whitesmoke" variant="h6">
-              <Link href={`/profile/${currentUser?.id}`}>
-                <a>
-                  {props?.profile?.nickname
-                    ? props?.profile?.nickname
-                    : currentUser?.name}
-                  のプロフィール
-                </a>
-              </Link>
-            </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "30%",
+            }}
+          >
+            <Link href={`/profile/${currentUser?.id}`}>
+              <Typography
+                variant="h6"
+                sx={{ cursor: "pointer", ":hover": { opacity: "0.8" } }}
+              >
+                {props?.profile?.nickname
+                  ? props?.profile?.nickname
+                  : currentUser?.name}
+                のプロフィール
+              </Typography>
+            </Link>
             <Box
               display={"flex"}
               width={"100%"}
@@ -216,18 +232,16 @@ const Blog = (props: Props) => {
             <Grid container spacing={2}>
               {currentPosts?.map((post) => (
                 <Grid item xs={12} sm={6} md={4} key={post.id}>
-                  <Card sx={{ margin: 1, ":hover": { opacity: "0.8" } }}>
-                    <CardHeader
-                      avatar={
-                        <Avatar
-                          sx={{ bgcolor: "white" }}
-                          aria-label="recipe"
-                          src={post?.author?.image}
-                        ></Avatar>
-                      }
-                      title={post?.author?.name}
-                      subheader={post.title}
-                    />
+                  <Card sx={{ margin: 1 }}>
+                    <Link href={`/profile/${post?.authorId}`}>
+                      <CardMedia
+                        sx={{
+                          height: 180,
+                          ":hover": { opacity: "0.8" },
+                        }}
+                        image={post?.author?.image}
+                      />
+                    </Link>
                     <Link href={`/p/${post.id}`}>
                       <CardContent
                         sx={{
@@ -236,6 +250,7 @@ const Blog = (props: Props) => {
                           textOverflow: "ellipsis",
                           height: "100px",
                           whiteSpace: "nowrap",
+                          ":hover": { opacity: "0.8" },
                         }}
                       >
                         <Typography
@@ -243,7 +258,9 @@ const Blog = (props: Props) => {
                           color="text.primary"
                           whiteSpace={"pre-wrap"}
                         >
-                          {post.content}
+                          {post.content.length > MAX_LENGTH
+                            ? post.content.slice(0, MAX_LENGTH) + "..."
+                            : post.content}
                         </Typography>
                       </CardContent>
                     </Link>
