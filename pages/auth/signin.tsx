@@ -1,19 +1,19 @@
 import { NextPage } from "next";
 import UserInputForm from "../../components/auth/userInputForm";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import { useCallback, useState } from "react";
 import Layout from "../../components/Layout";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { ChangeEvent } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
 
-const Signin: NextPage = () => {
-  const router = useRouter();
-  const { register, handleSubmit } = useForm({});
+type userRegisterErrorProps = {
+  email?: string;
+  password?: string;
+};
 
+const Signin: NextPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,10 +25,13 @@ const Signin: NextPage = () => {
     );
   }, []);
 
+  // errorの表示
+  const [error, setError] = useState<userRegisterErrorProps>({});
+
   // ログイン
   const login = useCallback(async () => {
     try {
-      signIn("credentials", {
+      const result = await signIn("credentials", {
         email: email,
         password: password,
         callbackUrl: "/",
@@ -48,13 +51,54 @@ const Signin: NextPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
+
       const data = await res.json();
       login();
     } catch (error) {
       console.error(error);
     }
-  }, [name, email, password, login]);
+  }, [name, email, password, login, error]);
 
+  const handleSubmit = useCallback(
+    async (e: ChangeEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      // passwordのバリデーション。8文字以上でなければエラーを返す
+      if (password.length < 8) {
+        setError({
+          ...error,
+          password: "パスワードは8文字以上で入力してください",
+        });
+        return;
+      }
+
+      if (variant === "login") {
+        // DBに登録されているemailとpasswordが一致しているか確認
+        const res = await fetch("/api/user/userValidation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (res.status === 400) {
+          const errorMessage = await res.json();
+          setError({ ...error, email: errorMessage.notFoundEmail });
+          return;
+        }
+
+        // 401エラーの場合は、パスワードが一致していない
+        if (res.status === 401) {
+          const errorMessage = await res.json();
+          setError({ ...error, password: errorMessage.inValidPassword });
+          return;
+        }
+
+        login();
+      } else {
+        signin();
+      }
+    },
+    [variant, login, signin, error]
+  );
   return (
     <Layout>
       <Box
@@ -73,7 +117,8 @@ const Signin: NextPage = () => {
         >
           <Stack
             component="form"
-            onSubmit={handleSubmit(variant === "register" ? signin : login)}
+            onSubmit={handleSubmit}
+            // onSubmit={handleSubmit(variant === "register" ? signin : login)}
             alignItems="center"
           >
             <Typography sx={{ marginTop: "10px" }}>
@@ -101,6 +146,7 @@ const Signin: NextPage = () => {
               value={email}
               placeholder="example@example.com"
             />
+            {error.email && <Alert severity="error">{error.email}</Alert>}
             <UserInputForm
               id="password"
               label="password"
@@ -110,6 +156,7 @@ const Signin: NextPage = () => {
               }}
               value={password}
             />
+            {error.password && <Alert severity="error">{error.password}</Alert>}{" "}
             <Box
               sx={{ display: "flex", alignItems: "center" }}
               justifyContent={"space-between"}
