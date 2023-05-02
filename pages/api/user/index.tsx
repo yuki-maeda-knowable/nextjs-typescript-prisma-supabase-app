@@ -9,6 +9,18 @@ export default async function handler(
   if (req.method === "POST") {
     const { name, email, password, image } = req.body;
 
+    // emailが重複していないか確認
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (existingUser) {
+      return res
+        .status(400)
+        .json({ duplicateEmail: "すでに使用されているメールアドレスです" });
+    }
+
     const hash_password = await hash(password, 10);
     const data = await prisma.user.create({
       data: {
