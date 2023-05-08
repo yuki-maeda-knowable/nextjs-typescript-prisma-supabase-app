@@ -19,7 +19,19 @@ export default async function handle(
         },
       });
 
-      return res.status(200).json({ profile });
+      const profileId = profile.id;
+      const profilePhotos = url.map((url) => {
+        return {
+          profileId: profileId,
+          url: url,
+        };
+      });
+
+      const photo = await prisma.photo.createMany({
+        data: profilePhotos,
+      });
+
+      return res.status(200).json({ profile, photo });
     } catch (error) {
       return res.status(401).json(error);
     }
