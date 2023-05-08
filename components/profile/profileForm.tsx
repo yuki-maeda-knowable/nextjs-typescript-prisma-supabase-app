@@ -64,12 +64,10 @@ const ProfileForm = ({ profile }) => {
 
   const handleChangeBirthday = (e: SelectChangeEvent) => {
     setBirthday(e.target.value);
-    console.log(birthday);
   };
 
   const handleChangeGender = (e: SelectChangeEvent) => {
     setGender(e.target.value);
-    console.log(gender);
   };
 
   // 画像がアップロードされたら、URLとファイルの中身をset
@@ -98,7 +96,6 @@ const ProfileForm = ({ profile }) => {
   };
 
   const deleteProfileImg = async (photoId: string, index: number) => {
-    alert(photoId);
     const res = await fetch(`/api/photo/${photoId}`, {
       method: "DELETE",
     });
@@ -117,7 +114,7 @@ const ProfileForm = ({ profile }) => {
     if (profileImage?.length != 0) {
       const urls = await Promise.all(
         profileImage?.map(async (img, index) => {
-          // mapでループさせる？_
+          // mapでループさせる
           //既に登録ずみprofileのurlが存在するか確認し、存在しなければアップロード
           if (!img.url) {
             //ランダムな文字列を生成
@@ -143,7 +140,7 @@ const ProfileForm = ({ profile }) => {
       userId: userId,
       url: photoUrls,
     };
-    //なければinsert
+
     const res = await fetch("/api/profile", {
       method: "POST",
       body: JSON.stringify(formData),
@@ -157,6 +154,26 @@ const ProfileForm = ({ profile }) => {
   // TODO: 画像の更新処理(未実装).nicknameは更新できる
   const updateProfile = async (profile: ProfileFormProps) => {
     const { nickname } = profile;
+    const urls = await Promise.all(
+      profileImage?.map(async (img, index) => {
+        // mapでループさせる
+        //既に登録ずみprofileのurlが存在するか確認し、存在しなければアップロード
+        if (!img.url) {
+          //ランダムな文字列を生成
+          const randomString = crypto.randomBytes(10).toString("hex");
+          //supabaseに画像をアップロード
+          const { data, error } = await supabase.storage
+            .from("photos")
+            .upload("user/profile/" + randomString + "-" + img.name, img);
+          //supabaseから画像のURLをDL
+          const url = await supabase.storage
+            .from("photos")
+            .getPublicUrl(data.path);
+          photoUrls.push(url.data.publicUrl);
+        }
+      })
+    );
+
     const formData = {
       nickname: nickname,
       userId: userId,
@@ -170,13 +187,12 @@ const ProfileForm = ({ profile }) => {
       },
     });
     const data = await res.json();
-    console.log(data);
     router.push(`/profile/${userId}`);
   };
 
   return (
     <Container sx={{ bgcolor: "background.default", height: "100vh" }}>
-      <Typography variant="h6" color="whitesmoke">
+      <Typography variant="h6">
         {variant === "register" ? "profile作成" : "profile編集"}
       </Typography>
       <Stack
