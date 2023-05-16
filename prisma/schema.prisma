@@ -20,22 +20,26 @@ model Post {
 }
 
 model User {
-  id            String      @id @default(cuid())
+  id            String         @id @default(cuid())
   name          String?
-  email         String?     @unique
+  email         String?        @unique
   emailVerified DateTime?
   image         String?
   password      String?
-  createdAt     DateTime    @default(now()) @map(name: "created_at")
-  updatedAt     DateTime    @updatedAt @map(name: "updated_at")
+  createdAt     DateTime       @default(now()) @map(name: "created_at")
+  updatedAt     DateTime       @updatedAt @map(name: "updated_at")
   posts         Post[]
   accounts      Account[]
   sessions      Session[]
   profile       Profile?
   favorites     Favorites[]
   comments      Comments[]
-  follower      Follows[]   @relation("follower")
-  following     Follows[]   @relation("following")
+  follower      Follows[]      @relation("follower")
+  following     Follows[]      @relation("following")
+  initiator     ChatRooms[]    @relation("initiator")
+  recipient     ChatRooms[]    @relation("recipient")
+  sender        ChatMessages[] @relation("sender")
+  receiver      ChatMessages[] @relation("receiver")
 
   @@map(name: "users")
 }
@@ -134,11 +138,35 @@ model PostTags {
 
 // followsテーブルを作成
 model Follows {
-  id          String    @id @default(cuid())
-  follower    User      @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  id          String @id @default(cuid())
   followerId  String
-  following   User      @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  follower    User   @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followingId String
+  following   User   @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@unique([followerId, followingId])
+}
+
+// ChatRoomsテーブルを作成
+model ChatRooms {
+  id          String         @id @default(cuid())
+  initiatorId String
+  initiator   User           @relation("initiator", fields: [initiatorId], references: [id], onDelete: Cascade) // チャットルームの開始者の情報(チャットルームの開始者のidを参照して、Userテーブルから情報を取得する)
+  recipientId String
+  recipient   User           @relation("recipient", fields: [recipientId], references: [id], onDelete: Cascade) // チャットルームの受信者の情報(チャットルームの受信者のidを参照して、Userテーブルから情報を取得する)
+  createdAt   DateTime       @default(now()) // 送信日時
+  chatRoom    ChatMessages[] @relation("chatRoom")
+}
+
+// ChatMessagesテーブルを作成
+model ChatMessages {
+  id         String    @id @default(cuid())
+  chatRoomId String // チャットルームのid
+  chatRoom   ChatRooms @relation("chatRoom", fields: [chatRoomId], references: [id], onDelete: Cascade) // チャットルームの情報(チャットルームのidを参照して、ChatRoomsテーブルから情報を取得する)
+  senderId   String // 送信者のid
+  sender     User      @relation("sender", fields: [senderId], references: [id], onDelete: Cascade) // 送信者の情報(送信者のidを参照して、Userテーブルから情報を取得する)
+  receiverId String // 受信者のid
+  receiver   User      @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade) // 受信者の情報(受信者のidを参照して、Userテーブルから情報を取得する)
+  message    String // メッセージ
+  createdAt  DateTime  @default(now()) // 送信日時
 }
