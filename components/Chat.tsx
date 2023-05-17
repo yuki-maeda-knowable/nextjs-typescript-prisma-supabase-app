@@ -1,5 +1,5 @@
 import { Typography, TextField, Button, Avatar, Box } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChatProps } from "../types/interface";
 import useCurrentUser from "../hooks/useCurrentUser";
 import { tableName } from "../lib/supabaseFunctions";
@@ -28,6 +28,9 @@ const Chat = ({ chatRoomId }) => {
 
   // chatRoomIdに紐付いたチャットをchatMessagesテーブルから取得する
   const { data: chats, mutate: mutateChats } = useChats(chatRoomId);
+
+  // 最新のチャットを表示する
+  const recentlySentMessagesRef = useRef<HTMLDivElement>(null);
 
   // リアルタイムデータ更新
   const fetchRealtimeData = () => {
@@ -87,6 +90,11 @@ const Chat = ({ chatRoomId }) => {
     (async () => {
       await setMessageTexts(chats);
     })();
+    // 最新のチャットを表示する
+    recentlySentMessagesRef.current?.scrollTo({
+      top: recentlySentMessagesRef.current?.scrollHeight,
+    });
+
     fetchRealtimeData();
   }, [chats, fetchRealtimeData]);
 
@@ -95,7 +103,13 @@ const Chat = ({ chatRoomId }) => {
       <Typography variant="h6">{receiverName}さんとのルーム</Typography>
 
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <Box>
+        <Box
+          ref={recentlySentMessagesRef}
+          sx={{
+            overflowY: "auto",
+            maxHeight: "600px",
+          }}
+        >
           {messageTexts?.map((messageText) => (
             <Box
               display={"flex"}
@@ -125,7 +139,6 @@ const Chat = ({ chatRoomId }) => {
                 )}
               </Box>
               <Typography
-                // senderなら右寄せ、receiverなら左寄せ
                 variant="body2"
                 sx={{
                   ml: 2,
