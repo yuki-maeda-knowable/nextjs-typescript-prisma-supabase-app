@@ -138,10 +138,26 @@ const Chat = ({ chatRoomId }) => {
                   />
                 )}
               </Box>
+              {/* メッセージの送信者が自分だったら、右側に表示する */}
+              {/* 送信者が自分だったら送信時間を表示する */}
+              {messageText.senderId === senderId && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mr: 1,
+                    mb: 1,
+                    color: "#999999",
+                  }}
+                >
+                  {new Date(messageText.createdAt).toLocaleString("ja-JP", {
+                    timeZone: process.env.NEXT_PUBLIC_TIME_ZONE,
+                  })}
+                </Typography>
+              )}
               <Typography
                 variant="body2"
                 sx={{
-                  ml: 2,
+                  mr: 2,
                   mt: 1,
                   borderRadius: "10px",
                   boxShadow: "0px 2.5px 5px 0.1px rgb(138, 149, 156)",
@@ -154,6 +170,35 @@ const Chat = ({ chatRoomId }) => {
               >
                 {messageText.message}
               </Typography>
+              {messageText.senderId !== senderId && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mt: 2,
+                    color: "#999999",
+                  }}
+                >
+                  {new Date(messageText.createdAt).toLocaleString("ja-JP", {
+                    timeZone: process.env.NEXT_PUBLIC_TIME_ZONE,
+                  })}
+                </Typography>
+              )}
+              <Box
+                ml={messageText.senderId === senderId ? 0 : 1}
+                mr={messageText.senderId === senderId ? 1 : 0}
+              >
+                {messageText.senderId === senderId ? (
+                  <Avatar
+                    src={
+                      messageText?.sender?.image
+                        ? messageText?.sender?.image
+                        : ""
+                    }
+                  />
+                ) : (
+                  ""
+                )}
+              </Box>
             </Box>
           ))}
           <Box

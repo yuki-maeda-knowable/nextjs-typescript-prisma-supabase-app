@@ -94,6 +94,7 @@ export interface ChatProps {
   senderId: string;
   receiverId: string;
   message: string;
+  createdAt?: string;
   sender?: {
     name: string;
     image: string;
