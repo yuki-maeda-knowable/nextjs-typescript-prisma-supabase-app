@@ -48,7 +48,42 @@ export default async function handler(
         },
       });
 
-      return res.status(200).json(matchedUser);
+      // chatRoomテーブルから、matchedUserに含まれるユーザのチャットルーム情報を取得する
+      const chatRooms = await prisma.chatRooms.findMany({
+        where: {
+          OR: [
+            {
+              initiatorId: currentUser.id,
+              recipientId: {
+                in: matchedUser.map((m) => m.follower.id),
+              },
+            },
+            {
+              initiatorId: {
+                in: matchedUser.map((m) => m.follower.id),
+              },
+              recipientId: currentUser.id,
+            },
+          ],
+        },
+      });
+
+      // matchedUserにchatRooms情報を追加してクライアント側に返す
+      const result = matchedUser.map((m) => {
+        const chatRoom = chatRooms.find(
+          (c) =>
+            (c.initiatorId === currentUser.id &&
+              c.recipientId === m.follower.id) ||
+            (c.initiatorId === m.follower.id &&
+              c.recipientId === currentUser.id)
+        );
+        return {
+          ...m,
+          chatRoom: chatRoom || null,
+        };
+      });
+
+      return res.status(200).json(result);
     } catch (error) {
       console.log(error);
       return res.status(500).end();

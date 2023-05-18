@@ -1,11 +1,13 @@
 import Layout from "../../components/Layout";
-import { Typography, Box, Avatar } from "@mui/material";
+import { Typography, Box, Avatar, Button } from "@mui/material";
 import useMatches from "../../hooks/useMatches";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSession } from "next-auth/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import Loading from "../loading";
+import { useRouter } from "next/router";
+import useCurrentUser from "../../hooks/useCurrentUser";
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
@@ -26,6 +28,8 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const Matches = () => {
+  const router = useRouter();
+  const { data: user } = useCurrentUser();
   // loadingの状態を管理
   const [open, setOpen] = useState(true);
   const { data: matchedUsers, mutate: mutateMatchedUsers } = useMatches();
@@ -35,8 +39,24 @@ const Matches = () => {
     if (matchedUsers) {
       setOpen(false);
     }
+
     mutateMatchedUsers();
   }, [matchedUsers, mutateMatchedUsers]);
+
+  const addChatRoom = async (recipientId: string) => {
+    const res = await fetch("/api/chatRooms", {
+      method: "POST",
+      body: JSON.stringify({
+        initiatorId: user.id,
+        recipientId: recipientId,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const chatRoom = await res.json();
+    router.push(`/chats/${chatRoom.id}`);
+  };
 
   // loading中は、ローディング画面を表示する
   if (!matchedUsers) {
@@ -60,21 +80,40 @@ const Matches = () => {
 
         <Box m={1}>
           {matchedUsers?.map((matchedUser) => (
-            <Link
-              href={`/profile/${matchedUser.follower.id}`}
-              key={matchedUser.follower.id}
-            >
-              <Box
-                display={"flex"}
-                p={1}
-                sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+            <Box display={"flex"}>
+              <Link
+                href={`/profile/${matchedUser.follower.id}`}
+                key={matchedUser?.follower?.id}
               >
-                <Avatar alt="user-image" src={matchedUser.follower.image} />
-                <Typography pl={1} pt={1} color={"text.primary"}>
-                  {matchedUser.follower.name}
-                </Typography>
+                <Box
+                  display={"flex"}
+                  p={1}
+                  sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+                >
+                  <Avatar alt="user-image" src={matchedUser.follower.image} />
+                  <Typography pl={1} pt={1} color={"text.primary"}>
+                    {matchedUser?.follower?.name}
+                  </Typography>
+                </Box>
+              </Link>
+              <Box>
+                {matchedUser?.chatRoom?.id ? (
+                  <Button
+                    href={`/chats/${matchedUser.chatRoom.id}`}
+                    sx={{ mt: 1 }}
+                  >
+                    チャットを送る
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => addChatRoom(matchedUser.follower.id)}
+                    sx={{ mt: 1 }}
+                  >
+                    チャットを初めて送る
+                  </Button>
+                )}
               </Box>
-            </Link>
+            </Box>
           ))}
         </Box>
       </Box>

@@ -87,3 +87,20 @@ export interface TagPostProps {
 export interface FollowButtonProps {
   followerId: string;
 }
+
+// Chatの型定義
+export interface ChatProps {
+  id?: string;
+  senderId: string;
+  receiverId: string;
+  message: string;
+  createdAt?: string;
+  sender?: {
+    name: string;
+    image: string;
+  };
+  receiver?: {
+    name: string;
+    image: string;
+  };
+}
