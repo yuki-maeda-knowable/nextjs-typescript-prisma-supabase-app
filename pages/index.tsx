@@ -73,7 +73,7 @@ const Blog = (props: Props) => {
   const handleSearch = () => {
     setSearchQuery(
       posts.filter((post) =>
-        post.title.toLowerCase().includes(ref.current.value)
+        post.content.toLowerCase().includes(ref.current.value)
       )
     );
   };
