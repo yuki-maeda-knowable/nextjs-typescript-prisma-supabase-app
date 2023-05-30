@@ -61,7 +61,11 @@ export default async function handler(req, res) {
   } catch (error) {
     console.log("catch error");
     console.log(error);
-    return res.status(400).end();
+    return res.status(400).json(
+      JSON.stringify({
+        error: error,
+      })
+    );
   }
 }
 
