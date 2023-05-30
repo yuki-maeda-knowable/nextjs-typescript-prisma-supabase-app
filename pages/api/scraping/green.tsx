@@ -3,6 +3,7 @@ import puppeteer from "puppeteer";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
+    console.log("method not allowed");
     return res.status(400).end();
   }
 
@@ -47,11 +48,11 @@ export default async function handler(req, res) {
     const jobDetails = await scrapeJobDetails(page, browser);
 
     await browser.close();
-    console.log(jobDetails);
 
     return res.status(200).json(jobDetails);
   } catch (error) {
     console.log(error);
+    console.log("catch error");
     return res.status(400).end();
   }
 }
