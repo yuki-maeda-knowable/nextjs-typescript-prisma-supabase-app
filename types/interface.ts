@@ -104,3 +104,15 @@ export interface ChatProps {
     image: string;
   };
 }
+
+// scrapingの型定義
+export interface ScrapingProps {
+  id?: string;
+  jobUrl?: string;
+  companyName?: string;
+  openPositionText?: string;
+  salaryRangeText?: string;
+  locationText?: string;
+  skillText?: string;
+  featureText?: string;
+}
