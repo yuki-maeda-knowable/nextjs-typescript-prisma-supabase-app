@@ -1,4 +1,3 @@
-import { he } from "date-fns/locale";
 import { NextApiResponse, NextApiRequest } from "next";
 import puppeteer from "puppeteer";
 
@@ -12,6 +11,8 @@ export default async function handler(req, res) {
     headless: "new",
     // headless: true,
   };
+
+  console.log(options);
 
   const url = "https://www.green-japan.com/search_key";
 
@@ -29,6 +30,8 @@ export default async function handler(req, res) {
   const submitSearchButton = "#js-real_search_btn";
 
   try {
+    console.log("try");
+
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto(url);
@@ -43,10 +46,14 @@ export default async function handler(req, res) {
       }
     }
 
+    console.log("before click");
+
     await page.click(submitSearchButton);
     await page.waitForNavigation();
 
     const jobDetails = await scrapeJobDetails(page, browser);
+
+    console.log(jobDetails);
 
     await browser.close();
 

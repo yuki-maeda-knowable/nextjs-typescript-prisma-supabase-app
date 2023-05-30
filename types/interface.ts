@@ -107,7 +107,7 @@ export interface ChatProps {
 
 // scrapingの型定義
 export interface ScrapingProps {
-  id?: string;
+  // id?: string;
   jobUrl?: string;
   companyName?: string;
   openPositionText?: string;
