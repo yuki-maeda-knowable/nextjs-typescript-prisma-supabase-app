@@ -189,6 +189,12 @@ const Blog = (props: Props) => {
             >
               <Link href={`/matches`}>matching Users</Link>
             </Typography>
+            <Typography
+              variant="h6"
+              sx={{ cursor: "pointer", ":hover": { opacity: "0.8" } }}
+            >
+              <Link href={`/scraping/green`}>Greenの求人をスクレイピング</Link>
+            </Typography>
           </Box>
 
           <Box
