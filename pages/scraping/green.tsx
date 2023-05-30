@@ -22,19 +22,33 @@ const Green = (props: ScrapingProps) => {
     return description === "" ? "なし" : description;
   };
 
+  const getScrapingKnowable = async () => {
+    setIsLoading(true);
+    const res = await fetch("/api/scraping/knowable");
+
+    const result = await res.json();
+    console.log(result);
+    setScrapingData(result);
+    setIsLoading(false);
+  };
+
   return (
     <Layout>
       <Typography>green</Typography>
       <Button onClick={getScrapingData}>Greenのサイトをスクレイピング</Button>
+      <Button onClick={getScrapingKnowable}>
+        ノウブルのサイトをスクレイピング
+      </Button>
 
       <Box>
-        {isLoading && <Typography>Greenの求人データを取得中...</Typography>}
-        {scrapingData?.length !== 0 && (
+        {/* {isLoading && <Typography>Greenの求人データを取得中...</Typography>} */}
+        {isLoading && <Typography>ノウブルの求人データを取得中...</Typography>}
+        {/* {scrapingData?.length !== 0 && (
           <Typography>
             Greenのデータを{scrapingData?.length}件取得しました。
           </Typography>
-        )}
-        {scrapingData &&
+        )} */}
+        {/* {scrapingData &&
           scrapingData.map((jobDetail) => (
             <ul key={jobDetail.companyName}>
               <li>会社名:{getData(jobDetail.companyName)}</li>
@@ -51,7 +65,10 @@ const Green = (props: ScrapingProps) => {
               <li>求人の特徴:{getData(jobDetail.featureText)}</li>
               <hr />
             </ul>
-          ))}
+          ))} */}
+
+        {/* スクレイピングデータが文字列で返ってくる */}
+        {scrapingData && <Typography>{scrapingData}</Typography>}
       </Box>
     </Layout>
   );
