@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     return res.status(200).json(jobDetails);
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ message: "スクレイピングに失敗しました。" });
+    return res.status(400).end();
   }
 }
 

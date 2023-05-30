@@ -10,10 +10,7 @@ const Green = (props: ScrapingProps) => {
 
   const getScrapingData = async () => {
     setIsLoading(true);
-    console.log("getScrapingData");
-
     const res = await fetch("/api/scraping/green");
-    console.log(res);
 
     const result = await res.json();
     console.log(result);
