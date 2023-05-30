@@ -12,8 +12,6 @@ export default async function handler(req, res) {
     // headless: true,
   };
 
-  console.log(options);
-
   const url = "https://www.green-japan.com/search_key";
 
   const inputJobHighFields = [
@@ -30,8 +28,6 @@ export default async function handler(req, res) {
   const submitSearchButton = "#js-real_search_btn";
 
   try {
-    console.log("try");
-
     const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto(url);
@@ -46,26 +42,17 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log("before click");
-
     await page.click(submitSearchButton);
     await page.waitForNavigation();
 
     const jobDetails = await scrapeJobDetails(page, browser);
 
-    console.log(jobDetails);
-
     await browser.close();
 
     return res.status(200).json(jobDetails);
   } catch (error) {
-    console.log("catch error");
     console.log(error);
-    return res.status(400).json(
-      JSON.stringify({
-        error: error,
-      })
-    );
+    return res.status(400).json(error);
   }
 }
 
