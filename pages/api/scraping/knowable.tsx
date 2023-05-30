@@ -12,7 +12,8 @@ export default async function handler(req, res) {
     // headless: true,
   };
 
-  const url = "https://knowable.co.jp/";
+  const url = "https://scraping-training.vercel.app";
+  // const url = "https://knowable.co.jp/";
 
   // const inputJobHighFields = [
   //   {
@@ -46,14 +47,17 @@ export default async function handler(req, res) {
     // await page.waitForNavigation();
     // "#hmessage .inner .hmessage__textarea .hmessage__text"がよみこまれるまで待機
     await page.waitForSelector(
-      "#hmessage .inner .hmessage__textarea .hmessage__text"
+      // "#hmessage .inner .hmessage__textarea .hmessage__text"
+      "header"
     );
+
     // const jobDetails = await scrapeJobDetails(page, browser);
     //  "#hmessage .inner .hmessage__textarea .hmessage__text"のテキストを取得しresultに格納
-    const result = await page.$$eval(
-      "#hmessage .inner .hmessage__textarea .hmessage__text",
-      (elements) => elements.map((e) => e.textContent)
+    const result = await page.$eval(
+      "header div a span.text-sm",
+      (element) => element.textContent
     );
+
     // const result = await page.$$eval(
     //   "#hmessage .inner .hmessage__textarea .hmessage__text"
 
