@@ -1,3 +1,4 @@
+import { he } from "date-fns/locale";
 import { NextApiResponse, NextApiRequest } from "next";
 import puppeteer from "puppeteer";
 
@@ -8,8 +9,8 @@ export default async function handler(req, res) {
   }
 
   const options = {
-    // headless: "new",
-    headless: true,
+    headless: "new",
+    // headless: true,
   };
 
   const url = "https://www.green-japan.com/search_key";
@@ -28,7 +29,7 @@ export default async function handler(req, res) {
   const submitSearchButton = "#js-real_search_btn";
 
   try {
-    const browser = await puppeteer.launch(options);
+    const browser = await puppeteer.launch({ headless: "new" });
     const page = await browser.newPage();
     await page.goto(url);
 
@@ -51,8 +52,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json(jobDetails);
   } catch (error) {
-    console.log(error);
     console.log("catch error");
+    console.log(error);
     return res.status(400).end();
   }
 }
