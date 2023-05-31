@@ -65,11 +65,13 @@ export default async function handler(req, res) {
     //   "#hmessage .inner .hmessage__textarea .hmessage__text"
 
     await browser.close();
-
-    return res.status(200).json(result);
+    // jsonでresult, urlを返す
+    return res.status(200).json({ result, url });
   } catch (error) {
     console.log(error);
-    return res.status(400).end();
+    // errorの場合、400を返し、urlを返す
+    return res.status(400).json({ error, url });
+    // return res.status(400).end();
   }
 }
 

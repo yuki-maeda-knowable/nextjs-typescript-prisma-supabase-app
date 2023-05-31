@@ -25,10 +25,12 @@ const Green = (props: ScrapingProps) => {
   const getScrapingKnowable = async () => {
     setIsLoading(true);
     const res = await fetch("/api/scraping/knowable");
+    // errorが返ってきたら、400を返す
+    console.log(res);
 
     const result = await res.json();
     console.log(result);
-    setScrapingData(result);
+    setScrapingData(result.result);
     setIsLoading(false);
   };
 
