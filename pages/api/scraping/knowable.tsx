@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   };
 
   // const url = "https://scraping-training.vercel.app";
-  const url = "https://www.mizuhobank.co.jp/rate_fee/rate_interest.html";
+  const url = "https://scraping-check.vercel.app/";
+  // const url = "https://www.mizuhobank.co.jp/rate_fee/rate_interest.html";
   // const url = "https://knowable.co.jp/";
 
   // const inputJobHighFields = [
@@ -49,13 +50,13 @@ export default async function handler(req, res) {
     // "#hmessage .inner .hmessage__textarea .hmessage__text"がよみこまれるまで待機
     await page.waitForSelector(
       // "#hmessage .inner .hmessage__textarea .hmessage__text"
-      "#mainCol"
+      "main div p"
     );
 
     // const jobDetails = await scrapeJobDetails(page, browser);
     //  "#hmessage .inner .hmessage__textarea .hmessage__text"のテキストを取得しresultに格納
     const result = await page.$eval(
-      "#mainCol .h1Tit",
+      "main div p",
       // "header div a span.text-sm",
       (element) => element.textContent
     );
